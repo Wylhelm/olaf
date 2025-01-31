@@ -1,0 +1,46 @@
+{
+  "salt_inventory": [
+    {
+      "id": "SALT-001",
+      "type": "rock_salt",
+      "current_quantity_tons": 250,
+      "max_capacity_tons": 500,
+      "storage_location": "Main Depot",
+      "last_refill_date": "2025-01-25",
+      "last_updated": "2025-01-31T12:00:00",
+      "minimum_threshold": 50,
+      "price_per_ton": 95.00,
+      "supplier": "Regional Salt Supply Co."
+    },
+    {
+      "id": "SALT-002",
+      "type": "treated_salt",
+      "current_quantity_tons": 150,
+      "max_capacity_tons": 300,
+      "storage_location": "East Depot",
+      "last_refill_date": "2025-01-27",
+      "last_updated": "2025-01-31T12:00:00",
+      "minimum_threshold": 30,
+      "price_per_ton": 125.00,
+      "supplier": "Regional Salt Supply Co."
+    },
+    {
+      "id": "SALT-003",
+      "type": "rock_salt",
+      "current_quantity_tons": 175,
+      "max_capacity_tons": 400,
+      "storage_location": "West Depot",
+      "last_refill_date": "2025-01-26",
+      "last_updated": "2025-01-31T12:00:00",
+      "minimum_threshold": 40,
+      "price_per_ton": 95.00,
+      "supplier": "Regional Salt Supply Co."
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-01-31T17:49:45",
+    "total_rock_salt_available": 425,
+    "total_treated_salt_available": 150,
+    "currency": "CAD"
+  }
+}

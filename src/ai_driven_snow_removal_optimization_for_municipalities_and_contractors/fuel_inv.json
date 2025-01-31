@@ -1,0 +1,46 @@
+{
+  "fuel_inventory": [
+    {
+      "id": "FUEL-001",
+      "type": "diesel",
+      "current_quantity_liters": 5000,
+      "max_capacity_liters": 10000,
+      "storage_location": "Main Depot",
+      "last_refill_date": "2025-01-30",
+      "last_updated": "2025-01-31T12:00:00",
+      "minimum_threshold": 1000,
+      "price_per_liter": 1.45,
+      "supplier": "Municipal Fuel Services"
+    },
+    {
+      "id": "FUEL-002",
+      "type": "gasoline",
+      "current_quantity_liters": 2500,
+      "max_capacity_liters": 5000,
+      "storage_location": "East Depot",
+      "last_refill_date": "2025-01-29",
+      "last_updated": "2025-01-31T12:00:00",
+      "minimum_threshold": 500,
+      "price_per_liter": 1.55,
+      "supplier": "Municipal Fuel Services"
+    },
+    {
+      "id": "FUEL-003",
+      "type": "diesel",
+      "current_quantity_liters": 3500,
+      "max_capacity_liters": 8000,
+      "storage_location": "West Depot",
+      "last_refill_date": "2025-01-28",
+      "last_updated": "2025-01-31T12:00:00",
+      "minimum_threshold": 800,
+      "price_per_liter": 1.45,
+      "supplier": "Municipal Fuel Services"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-01-31T17:49:45",
+    "total_diesel_available": 8500,
+    "total_gasoline_available": 2500,
+    "currency": "CAD"
+  }
+}

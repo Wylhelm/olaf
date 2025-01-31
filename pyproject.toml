@@ -1,0 +1,20 @@
+[project]
+name = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors"
+version = "0.1.0"
+description = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "crewai[tools]>=0.86.0,<1.0.0"
+]
+
+[project.scripts]
+ai_driven_snow_removal_optimization_for_municipalities_and_contractors = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main:run"
+run_crew = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main:run"
+train = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main:train"
+replay = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main:replay"
+test = "ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
