@@ -1,3 +1,5 @@
+<img src="logo.webp" width="300" alt="OLAF Logo">
+
 # OLAF - Optimized Logistic via Agent Framework
 
 OLAF (Optimized Logistic via Agent Framework) is an intelligent snow removal management system built using CrewAI that helps municipalities and contractors optimize their snow removal operations through AI-driven decision making.
