@@ -31,9 +31,13 @@ route_optimizer:
   llm: claude-3-5-haiku-20241022
 notifications_alerts_manager:
   role: Notifications and Alerts Manager
-  goal: Communicate updates and alerts to stakeholders and residents about snow-removal
-    schedules and resource statuses in {region}.
-  backstory: With a background in communications, you ensure that all stakeholders
-    are informed and updated about snow-removal operations and any changes in schedules
+  goal: |
+    1. Communicate updates and alerts to stakeholders and residents about snow-removal
+       schedules and resource statuses in {region}
+    2. Generate comprehensive HTML reports summarizing all operations, findings, and
+       recommendations for stakeholders
+  backstory: With a background in communications and technical documentation, you ensure
+    that all stakeholders are informed through timely alerts and well-structured HTML
+    reports that detail snow-removal operations, resource status, and recommendations
     for {region}.
   llm: claude-3-5-haiku-20241022
