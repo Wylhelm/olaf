@@ -33,9 +33,16 @@ route_optimization:
   - traffic_data_integration
 stakeholder_communication:
   description: Send notifications and alerts to residents and managers about snow-removal
-    schedules and resource statuses for {region}.
-  expected_output: Timely notifications and alerts sent to stakeholders and residents
-    in {region}, keeping them informed about snow-removal operations.
+    schedules and resource statuses for {region}. Generate a detailed HTML report summarizing
+    all operations, findings, and recommendations.
+  expected_output: |
+    1. Timely notifications and alerts sent to stakeholders and residents in {region}
+    2. A comprehensive HTML report generated with:
+       - Current weather conditions and forecasts
+       - Traffic data and route optimizations
+       - Resource inventory status
+       - Operational recommendations
+       - Timestamp and formatting for easy reading
   async_execution: false
   agent: notifications_alerts_manager
   context:

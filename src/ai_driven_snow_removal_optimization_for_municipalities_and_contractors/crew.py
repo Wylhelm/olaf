@@ -2,6 +2,10 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import JSONSearchTool, ScrapeWebsiteTool
 from .tools.local_inventory_tool import LocalInventoryTool
+from .tools.report_generator_tool import ReportGeneratorTool
+from pathlib import Path
+import os
+from datetime import datetime
 
 @CrewBase
 class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
@@ -43,7 +47,10 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
     def notifications_alerts_manager(self) -> Agent:
         return Agent(
             config=self.agents_config['notifications_alerts_manager'],
-            tools=[JSONSearchTool()],
+            tools=[
+                JSONSearchTool(),
+                ReportGeneratorTool()
+            ],
         )
 
 
@@ -79,9 +86,11 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
     def stakeholder_communication(self) -> Task:
         return Task(
             config=self.tasks_config['stakeholder_communication'],
-            tools=[JSONSearchTool()],
+            tools=[
+                JSONSearchTool(),
+                ReportGeneratorTool()
+            ]
         )
-
 
     @crew
     def crew(self) -> Crew:
