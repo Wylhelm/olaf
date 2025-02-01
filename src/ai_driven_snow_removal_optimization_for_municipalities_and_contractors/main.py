@@ -20,7 +20,7 @@ def run():
     """
     print("Starting OLAF agents execution...")
     inputs = {
-        'region': 'Toronto'
+        'region': 'New-York'
     }
     AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew().crew().kickoff(inputs=inputs)
 
@@ -30,7 +30,7 @@ def train():
     Train the crew for a given number of iterations.
     """
     inputs = {
-        'region': 'Toronto'
+        'region': 'New-York'
     }
     try:
         AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
