@@ -13,7 +13,8 @@ weather_monitor:
     real time to assist in snow-removal planning.
   backstory: With expertise in meteorology, you provide accurate and timely weather
     forecasts to aid in proactive snow-removal strategies for {region}.
-  llm: claude-3-5-haiku-20241022
+  model: lmstudio/meta-llama-3.1-8b-instruct@q8_0
+  api_base: http://10.0.0.175:1234/v1
 stock_resources_manager:
   role: Stock and Resources Manager
   goal: Manage inventory levels of salt and fuel by checking online sources and local inventory files (fuel_inv.json and salt_inv.json),
@@ -21,14 +22,16 @@ stock_resources_manager:
   backstory: As the Stock and Resources Manager, you oversee the efficient use of resources by monitoring both online and local
     inventory data. When online sources are unavailable, you check the local JSON inventory files to track salt and fuel levels,
     preventing shortages and ensuring readiness for snow-removal tasks in {region}.
-  llm: claude-3-5-haiku-20241022
+  model: lmstudio/meta-llama-3.1-8b-instruct@q8_0
+  api_base: http://10.0.0.175:1234/v1
 route_optimizer:
   role: Route Optimization Expert
   goal: Plan and adjust snow-removal routes in real time based on current weather
     and traffic conditions in {region}.
   backstory: Specializing in logistics and route planning, you ensure that snow-removal
     operations are conducted efficiently and effectively across {region}.
-  llm: claude-3-5-haiku-20241022
+  model: lmstudio/meta-llama-3.1-8b-instruct@q8_0
+  api_base: http://10.0.0.175:1234/v1
 notifications_alerts_manager:
   role: Notifications and Alerts Manager
   goal: |

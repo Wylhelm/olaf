@@ -3,6 +3,7 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import JSONSearchTool, ScrapeWebsiteTool
 from .tools.local_inventory_tool import LocalInventoryTool
 from .tools.report_generator_tool import ReportGeneratorTool
+from .tools.tomtom_traffic_tool import TomTomTrafficTool
 from pathlib import Path
 import os
 from datetime import datetime
@@ -20,15 +21,44 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
 
     @agent
     def weather_monitor(self) -> Agent:
+        config = self.agents_config['weather_monitor']
+        if 'model' in config:
+            if config['model'].startswith('ollama/'):
+                config['llm'] = config['model']
+                config['api_base_url'] = config.pop('api_base')
+                del config['model']
+            elif config['model'].startswith('lmstudio/'):
+                model_name = config['model'].replace('lmstudio/', '')
+                config['model'] = model_name
+                config['api_key'] = 'not-needed'
+                config['base_url'] = config.pop('api_base')
+                config['model_type'] = 'openai'
+            
         return Agent(
-            config=self.agents_config['weather_monitor'],
-            tools=[ScrapeWebsiteTool()],
+            config=config,
+            tools=[
+                ScrapeWebsiteTool(),
+                TomTomTrafficTool()
+            ],
         )
 
     @agent
     def stock_resources_manager(self) -> Agent:
+        config = self.agents_config['stock_resources_manager']
+        if 'model' in config:
+            if config['model'].startswith('ollama/'):
+                config['llm'] = config['model']
+                config['api_base_url'] = config.pop('api_base')
+                del config['model']
+            elif config['model'].startswith('lmstudio/'):
+                model_name = config['model'].replace('lmstudio/', '')
+                config['model'] = model_name
+                config['api_key'] = 'not-needed'
+                config['base_url'] = config.pop('api_base')
+                config['model_type'] = 'openai'
+            
         return Agent(
-            config=self.agents_config['stock_resources_manager'],
+            config=config,
             tools=[
                 JSONSearchTool(),
                 ScrapeWebsiteTool(),
@@ -38,15 +68,44 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
 
     @agent
     def route_optimizer(self) -> Agent:
+        config = self.agents_config['route_optimizer']
+        if 'model' in config:
+            if config['model'].startswith('ollama/'):
+                config['llm'] = config['model']
+                config['api_base_url'] = config.pop('api_base')
+                del config['model']
+            elif config['model'].startswith('lmstudio/'):
+                model_name = config['model'].replace('lmstudio/', '')
+                config['model'] = model_name
+                config['api_key'] = 'not-needed'
+                config['base_url'] = config.pop('api_base')
+                config['model_type'] = 'openai'
+            
         return Agent(
-            config=self.agents_config['route_optimizer'],
-            tools=[ScrapeWebsiteTool()],
+            config=config,
+            tools=[
+                ScrapeWebsiteTool(),
+                TomTomTrafficTool()
+            ],
         )
 
     @agent
     def notifications_alerts_manager(self) -> Agent:
+        config = self.agents_config['notifications_alerts_manager']
+        if 'model' in config:
+            if config['model'].startswith('ollama/'):
+                config['llm'] = config['model']
+                config['api_base_url'] = config.pop('api_base')
+                del config['model']
+            elif config['model'].startswith('lmstudio/'):
+                model_name = config['model'].replace('lmstudio/', '')
+                config['model'] = model_name
+                config['api_key'] = 'not-needed'
+                config['base_url'] = config.pop('api_base')
+                config['model_type'] = 'openai'
+            
         return Agent(
-            config=self.agents_config['notifications_alerts_manager'],
+            config=config,
             tools=[
                 JSONSearchTool(),
                 ReportGeneratorTool()
@@ -65,7 +124,10 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
     def traffic_data_integration(self) -> Task:
         return Task(
             config=self.tasks_config['traffic_data_integration'],
-            tools=[ScrapeWebsiteTool()],
+            tools=[
+                ScrapeWebsiteTool(),
+                TomTomTrafficTool()
+            ],
         )
 
     @task
@@ -79,7 +141,10 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
     def route_optimization(self) -> Task:
         return Task(
             config=self.tasks_config['route_optimization'],
-            tools=[ScrapeWebsiteTool()],
+            tools=[
+                ScrapeWebsiteTool(),
+                TomTomTrafficTool()
+            ],
         )
 
     @task
