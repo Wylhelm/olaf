@@ -1,17 +1,21 @@
 ---
+global_planning:
+  description: Analyze overall situation and create high-level strategy for snow removal operations in {region}, coordinating between weather, traffic, resources, and route optimization aspects.
+  expected_output: A comprehensive strategic plan for {region} that includes weather considerations, resource allocation guidelines, and high-level routing strategies.
+  allow_delegation: true
+  agent: global_planification
+
 weather_data_collection:
   description: Gather real-time weather data for {region} using the ScrapeWebsiteTool
     and update the system to assist in snow-removal planning.
   expected_output: Real-time weather data for {region} updated in the system, providing
     accurate forecasts for snow-removal planning.
-  async_execution: false
   agent: weather_monitor
 traffic_data_integration:
   description: Scrape traffic data for {region} and feed it into the routing system
     for real-time adjustments to snow-removal routes.
   expected_output: Real-time traffic data for {region} integrated into the routing
     system, allowing for dynamic route adjustments.
-  async_execution: false
   agent: route_optimizer
 resource_monitoring:
   description: Query inventory levels of salt and fuel using online sources (JSONSearchTool)
@@ -19,16 +23,15 @@ resource_monitoring:
     to alert when resources are below threshold for {region}.
   expected_output: Updated inventory levels of salt and fuel for {region} from either online
     or local sources, with alerts generated for low resources and clear indication of data source used.
-  async_execution: false
   agent: stock_resources_manager
 route_optimization:
   description: Continuously optimize snow-removal routes using real-time weather and
     traffic data for {region}, updating fleet assignments as needed.
   expected_output: Optimized snow-removal routes for {region}, with updated fleet
     assignments based on current conditions.
-  async_execution: false
   agent: route_optimizer
   context:
+  - global_planning
   - weather_data_collection
   - traffic_data_integration
 stakeholder_communication:
@@ -43,8 +46,8 @@ stakeholder_communication:
        - Resource inventory status
        - Operational recommendations
        - Timestamp and formatting for easy reading
-  async_execution: false
   agent: notifications_alerts_manager
   context:
+  - global_planning
   - resource_monitoring
   - route_optimization
