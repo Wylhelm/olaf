@@ -14,9 +14,24 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
 
     @agent
     def global_planification(self) -> Agent:
+        config = self.agents_config['global_planification']
+        if 'model' in config:
+            if config['model'].startswith('ollama/'):
+                config['llm'] = config['model']
+                config['api_base_url'] = config.pop('api_base')
+                del config['model']
+            elif config['model'].startswith('lmstudio/'):
+                model_name = config['model'].replace('lmstudio/', '')
+                config['model'] = model_name
+                config['api_key'] = 'not-needed'
+                config['base_url'] = config.pop('api_base')
+                config['model_type'] = 'openai'
+            
         return Agent(
-            config=self.agents_config['global_planification'],
-            tools=[JSONSearchTool()],
+            config=config,
+            tools=[
+                JSONSearchTool()
+            ],
         )
 
     @agent
@@ -112,6 +127,15 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
             ],
         )
 
+
+    @task
+    def global_planning(self) -> Task:
+        return Task(
+            config=self.tasks_config['global_planning'],
+            tools=[
+                JSONSearchTool()
+            ],
+        )
 
     @task
     def weather_data_collection(self) -> Task:

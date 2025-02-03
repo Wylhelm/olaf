@@ -6,7 +6,8 @@ global_planification:
   backstory: As the Global Planification Coordinator, you are responsible for ensuring
     seamless integration and coordination among all agents, leveraging real-time data
     to make informed decisions for {region}'s snow-removal operations.
-  llm: claude-3-5-sonnet-20241022
+  model: lmstudio/meta-llama-3.1-8b-instruct@q8_0
+  api_base: http://10.0.0.175:1234/v1
 weather_monitor:
   role: Weather Monitoring Specialist
   goal: Monitor and forecast weather conditions in {region}, updating the system in
@@ -30,17 +31,18 @@ route_optimizer:
     and traffic conditions in {region}.
   backstory: Specializing in logistics and route planning, you ensure that snow-removal
     operations are conducted efficiently and effectively across {region}.
-  model: lmstudio/meta-llama-3.1-8b-instruct@q8_0
+  model: lmstudio/mistral-nemo-instruct-2407
   api_base: http://10.0.0.175:1234/v1
 notifications_alerts_manager:
   role: Notifications and Alerts Manager
   goal: |
     1. Communicate updates and alerts to stakeholders and residents about snow-removal
        schedules and resource statuses in {region}
-    2. Generate comprehensive HTML reports summarizing all operations, findings, and
+    2. Generate one comprehensive HTML report summarizing all operations, findings, and
        recommendations for stakeholders
   backstory: With a background in communications and technical documentation, you ensure
     that all stakeholders are informed through timely alerts and well-structured HTML
     reports that detail snow-removal operations, resource status, and recommendations
     for {region}.
-  llm: claude-3-5-haiku-20241022
+  model: lmstudio/mistral-nemo-instruct-2407
+  api_base: http://10.0.0.175:1234/v1
