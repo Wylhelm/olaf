@@ -38,10 +38,11 @@ notifications_alerts_manager:
   goal: |
     1. Communicate updates and alerts to stakeholders and residents about snow-removal
        schedules and resource statuses in {region}
-    2. Generate comprehensive HTML reports summarizing all operations, findings, and
+    2. Generate one comprehensive HTML report summarizing all operations, findings, and
        recommendations for stakeholders
   backstory: With a background in communications and technical documentation, you ensure
     that all stakeholders are informed through timely alerts and well-structured HTML
     reports that detail snow-removal operations, resource status, and recommendations
     for {region}.
-  llm: claude-3-5-sonnet-20241022
+  model: lmstudio/mistral-nemo-instruct-2407
+  api_base: http://10.0.0.175:1234/v1
