@@ -30,11 +30,7 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Agent(
             config=config,
             tools=[
-                JSONSearchTool(),
-                ScrapeWebsiteTool(),
-                TomTomTrafficTool(),
-                LocalInventoryTool(),
-                ReportGeneratorTool()
+                JSONSearchTool()
             ],
         )
 
@@ -137,11 +133,7 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Task(
             config=self.tasks_config['global_planning'],
             tools=[
-                JSONSearchTool(),
-                ScrapeWebsiteTool(),
-                TomTomTrafficTool(),
-                LocalInventoryTool(),
-                ReportGeneratorTool()
+                JSONSearchTool()
             ],
         )
 
