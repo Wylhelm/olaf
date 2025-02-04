@@ -4,6 +4,7 @@ from crewai_tools import JSONSearchTool, ScrapeWebsiteTool
 from .tools.local_inventory_tool import LocalInventoryTool
 from .tools.report_generator_tool import ReportGeneratorTool
 from .tools.tomtom_traffic_tool import TomTomTrafficTool
+from .tools.weather_data_tool import WeatherDataTool
 from pathlib import Path
 import os
 from datetime import datetime
@@ -30,7 +31,7 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Agent(
             config=config,
             tools=[
-                JSONSearchTool()
+                ScrapeWebsiteTool()
             ],
         )
 
@@ -52,8 +53,8 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Agent(
             config=config,
             tools=[
-                ScrapeWebsiteTool(),
-                TomTomTrafficTool()
+                WeatherDataTool(),
+                ScrapeWebsiteTool()  # Keep as backup for additional weather sources
             ],
         )
 
@@ -75,7 +76,6 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Agent(
             config=config,
             tools=[
-                JSONSearchTool(),
                 ScrapeWebsiteTool(),
                 LocalInventoryTool()
             ],
@@ -99,8 +99,8 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Agent(
             config=config,
             tools=[
-                ScrapeWebsiteTool(),
-                TomTomTrafficTool()
+                TomTomTrafficTool(),
+                ScrapeWebsiteTool()
             ],
         )
 
@@ -141,7 +141,10 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
     def weather_data_collection(self) -> Task:
         return Task(
             config=self.tasks_config['weather_data_collection'],
-            tools=[ScrapeWebsiteTool()],
+            tools=[
+                WeatherDataTool(),
+                ScrapeWebsiteTool()  # Keep as backup for additional weather sources
+            ],
         )
 
     @task
@@ -186,8 +189,8 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         """Creates the AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractors crew"""
         print("OLAF initialized, kicking off tasks...")
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents,  # Automatically created by the @agent decorator
+            tasks=self.tasks,    # Automatically created by the @task decorator
             process=Process.sequential,
             verbose=True,
         )

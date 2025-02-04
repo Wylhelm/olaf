@@ -6,46 +6,100 @@ global_planning:
   agent: global_planification
 
 weather_data_collection:
-  description: Gather real-time weather data for {region} using the ScrapeWebsiteTool
-    and update the system to assist in snow-removal planning.
-  expected_output: Real-time weather data for {region} updated in the system, providing
-    accurate forecasts for snow-removal planning.
+  description: |
+    Gather comprehensive weather data for {region} using the WeatherDataTool to collect:
+    - Current temperature and conditions
+    - Snowfall amounts and accumulation
+    - Road surface temperature estimates
+    - Weather forecasts and alerts
+    This data will be used for route optimization and resource planning.
+  expected_output: |
+    Detailed weather analysis for {region} including:
+    - Current weather conditions
+    - Snow accumulation data
+    - Road surface conditions
+    - 24-hour forecast
+    - Weather-related alerts
   agent: weather_monitor
+  context:
+    - global_planning
 traffic_data_integration:
-  description: Scrape traffic data for {region} and feed it into the routing system
-    for real-time adjustments to snow-removal routes.
-  expected_output: Real-time traffic data for {region} integrated into the routing
-    system, allowing for dynamic route adjustments.
+  description: |
+    Collect and analyze traffic data for {region} using TomTomTrafficTool to:
+    - Monitor real-time traffic conditions
+    - Identify road closures and incidents
+    - Track traffic flow patterns
+    - Consider weather impact on traffic
+    This data will be integrated with weather conditions for optimal route planning.
+  expected_output: |
+    Comprehensive traffic analysis including:
+    - Current traffic conditions
+    - Identified incidents and closures
+    - Traffic flow patterns
+    - Weather-impacted routes
+    - Recommended route adjustments
   agent: route_optimizer
+  context:
+    - weather_data_collection
 resource_monitoring:
-  description: Query inventory levels of salt and fuel using online sources (JSONSearchTool)
-    and local inventory files (fuel_inv.json and salt_inv.json when online sources are unavailable)
-    to alert when resources are below threshold for {region}.
-  expected_output: Updated inventory levels of salt and fuel for {region} from either online
-    or local sources, with alerts generated for low resources and clear indication of data source used.
+  description: |
+    Monitor and manage resource inventory using LocalInventoryTool and online sources:
+    - Track salt and fuel inventory levels
+    - Monitor usage rates based on weather conditions
+    - Calculate resource requirements for planned routes
+    - Generate alerts for low inventory levels
+    - Recommend resource allocation based on weather forecast
+  expected_output: |
+    Detailed resource status report including:
+    - Current inventory levels for all resources
+    - Usage rate analysis
+    - Projected needs based on weather forecast
+    - Low inventory alerts
+    - Resource allocation recommendations
+    - Data source verification (online/local)
   agent: stock_resources_manager
+  context:
+    - global_planning
 route_optimization:
-  description: Continuously optimize snow-removal routes using real-time weather and
-    traffic data for {region}, updating fleet assignments as needed.
-  expected_output: Optimized snow-removal routes for {region}, with updated fleet
-    assignments based on current conditions.
+  description: |
+    Optimize snow removal routes by integrating:
+    - Current weather conditions and forecasts
+    - Real-time traffic data and incidents
+    - Resource availability and locations
+    - Road priority levels
+    - Historical performance data
+    Generate efficient routes that consider all factors affecting snow removal operations.
+  expected_output: |
+    Comprehensive route optimization plan including:
+    - Optimized routes for each vehicle
+    - Priority-based scheduling
+    - Resource allocation per route
+    - Estimated completion times
+    - Alternative routes for contingencies
+    - Weather and traffic impact analysis
   agent: route_optimizer
   context:
   - global_planning
   - weather_data_collection
   - traffic_data_integration
 stakeholder_communication:
-  description: Send notifications and alerts to residents and managers about snow-removal
-    schedules and resource statuses for {region}. Generate a detailed HTML report summarizing
-    all operations, findings, and recommendations.
+  description: |
+    Generate comprehensive reports and alerts using the enhanced ReportGeneratorTool:
+    - Create interactive HTML reports with visualizations
+    - Generate weather condition maps and forecasts
+    - Display route optimization maps with traffic overlay
+    - Show resource inventory levels with visual indicators
+    - Provide operational recommendations with supporting data
+    - Include priority-based schedules and completion estimates
   expected_output: |
-    1. Timely notifications and alerts sent to stakeholders and residents in {region}
-    2. A comprehensive HTML report generated with:
-       - Current weather conditions and forecasts
-       - Traffic data and route optimizations
-       - Resource inventory status
-       - Operational recommendations
-       - Timestamp and formatting for easy reading
+    Interactive HTML report containing:
+    - Visual weather dashboard with current conditions and forecasts
+    - Interactive maps showing optimized routes and traffic conditions
+    - Resource inventory visualizations with status indicators
+    - Operational timeline and progress tracking
+    - Detailed recommendations with data-driven justifications
+    - Automated alerts for critical updates
+    - Mobile-responsive design for field access
   agent: notifications_alerts_manager
   context:
   - global_planning
