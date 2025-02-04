@@ -39,7 +39,7 @@
   <rect class="task" x="748.036" y="500.11" width="160" height="40" rx="5"/>
   <text class="text" x="828.039" y="525.11" text-anchor="middle" style="white-space: pre; font-size: 15px;">Resource Monitoring</text>
   <text class="text" x="735" y="502" font-weight="bold" fill="#1976d2" style="white-space: pre; font-size: 15px;">3</text>
-  <path class="shadow" d="M200,460 L600,520 L1000,460 L600,580 Z"/>
+  <path class="shadow" d="M 200 379.538 L 600.091 479.769 L 1000.18 379.538 L 600.091 580 L 200 379.538 Z" style=""/>
   <rect class="agent" x="500" y="500" width="200" height="80" rx="5"/>
   <text class="text" x="600" y="535" text-anchor="middle" font-weight="bold" style="white-space: pre;">Route Optimizer</text>
   <text class="text" x="600" y="555" text-anchor="middle" style="white-space: pre;">Expert</text>
@@ -78,9 +78,9 @@
   <path class="connection" d="M 596.747 576.553 L 596.747 606.553"/>
   <path class="connection" d="M 701.044 522.155 L 748.998 522.156" style="transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(-1, 0, 0, -1, 0.000037, -0.000011)"/>
   <rect class="tool" x="119.325" y="417.539" width="180" height="40" rx="5"/>
-  <text class="text" x="203.335" y="443.861" text-anchor="middle" font-style="italic" style="white-space: pre; font-size: 15px;">ScrapeWebsite</text>
+  <text class="text" x="203.335" y="443.861" text-anchor="middle" font-style="italic" style="white-space: pre; font-size: 15px;">weather_data_tool</text>
   <path class="connection" d="M 608.629 950.926 L 608.629 980.926"/>
   <rect class="agent" x="793.771" y="1028.41" width="200" height="80" rx="5" style="fill: rgb(252, 253, 227); stroke: rgb(210, 25, 25);"/>
-  <text class="text" x="890.741" y="1071.05" text-anchor="middle" font-weight="bold" style="white-space: pre; font-size: 15px;">HTML Report</text>
+  <text class="text" x="890.741" y="1071.05" text-anchor="middle" font-weight="bold" style="white-space: pre; font-size: 15px;">HTML Report/Dashboard</text>
   <path class="connection" d="M 712.159 1072.77 L 791.861 1072.77" style=""/>
 </svg>
