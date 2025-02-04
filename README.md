@@ -37,32 +37,60 @@ git clone https://github.com/yourusername/olaf.git
 cd olaf
 ```
 
-2. Install dependencies:
+2. Set up a conda environment (recommended):
 ```bash
-pip install -r requirements.txt
+conda create -n olaf python=3.10
+conda activate olaf
 ```
 
-3. Copy the example environment file and configure your settings:
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+conda install plotly  # Required for report generation
+```
+
+4. Copy the example environment file and configure your settings:
 ```bash
 cp .env.example .env
 ```
 
 ## Usage
 
-OLAF can be run in different modes using the following commands:
+OLAF can be run using the crewai command-line tool:
 
 ```bash
 # Regular execution
-python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main run
+crewai run
 
 # Training mode
-python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main train <iterations> <filename>
+crewai train <iterations> <filename>
 
 # Test mode
-python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main test <iterations> <model_name>
+crewai test <iterations> <model_name>
 
 # Replay mode
-python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main replay <task_id>
+crewai replay <task_id>
+
+### Alternative Setup (Manual)
+
+If you encounter any issues with the crewai command, you can use the provided shell script:
+
+1. Make the script executable:
+```bash
+chmod +x run_crew.sh
+```
+
+2. Create an alias in your shell configuration (e.g., .zshrc or .bashrc):
+```bash
+alias crewai="/path/to/olaf/run_crew.sh"
+```
+
+3. Reload your shell configuration:
+```bash
+source ~/.zshrc  # or source ~/.bashrc
+```
+
+The script automatically sets up the required environment variables and allows you to use all crewai parameters normally.
 ```
 
 ## Project Structure

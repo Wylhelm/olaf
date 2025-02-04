@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="1200" height="900" xmlns="http://www.w3.org/2000/svg">
+  <style>
+        .agent { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; }
+        .tool { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+        .task { fill: #e8f5e9; stroke: #388e3c; stroke-width: 2; }
+        .text { font-family: Arial; }
+        .connection { stroke: #666; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+        .shadow { fill: #000; fill-opacity: 0.1; }
+    </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+  <text class="text" x="600" y="40" text-anchor="middle" font-size="24" font-weight="bold" style="white-space: pre;">
+        Snow Removal Operation Flow (Sequential Process)
+    </text>
+  <rect class="agent" x="500" y="120" width="200" height="80" rx="5"/>
+  <text class="text" x="600" y="155" text-anchor="middle" font-weight="bold" style="white-space: pre;">Global Planification</text>
+  <text class="text" x="600" y="175" text-anchor="middle" style="white-space: pre;">Coordinator</text>
+  <text class="text" x="600" y="190" text-anchor="middle" font-size="12" style="white-space: pre;">[ScrapeWebsite]</text>
+  <rect class="task" x="520" y="230" width="160" height="40" rx="5"/>
+  <text class="text" x="600" y="255" text-anchor="middle" style="white-space: pre;">Global Planning</text>
+  <text class="text" x="508" y="236" font-weight="bold" fill="#1976d2" style="white-space: pre; font-size: 15px;">1</text>
+  <g transform="translate(0,300)">
+    <rect class="agent" x="100" y="0" width="200" height="80" rx="5"/>
+    <text class="text" x="200" y="35" text-anchor="middle" font-weight="bold" style="white-space: pre;">Weather Monitor</text>
+    <text class="text" x="200" y="55" text-anchor="middle" style="white-space: pre;">Weather Specialist</text>
+    <text class="text" x="200" y="70" text-anchor="middle" font-size="12" style="white-space: pre;">[ScrapeWebsite]</text>
+    <rect class="agent" x="900" y="0" width="200" height="80" rx="5"/>
+    <text class="text" x="1000" y="35" text-anchor="middle" font-weight="bold" style="white-space: pre;">Stock Resources</text>
+    <text class="text" x="1000" y="55" text-anchor="middle" style="white-space: pre;">Manager</text>
+    <text class="text" x="1000" y="70" text-anchor="middle" font-size="12" style="white-space: pre;">[JSON, ScrapeWebSite, LocalInv]</text>
+  </g>
+  <rect class="task" x="277.651" y="499.747" width="174.378" height="40" rx="5" style=""/>
+  <text class="text" x="367.036" y="524.308" text-anchor="middle" style="white-space: pre; font-size: 15px;">Weather Data Collection</text>
+  <text class="text" x="259.942" y="503.975" font-weight="bold" fill="#1976d2" style="white-space: pre; font-size: 15px;">2</text>
+  <rect class="task" x="748.036" y="500.11" width="160" height="40" rx="5"/>
+  <text class="text" x="828.039" y="525.11" text-anchor="middle" style="white-space: pre; font-size: 15px;">Resource Monitoring</text>
+  <text class="text" x="735" y="502" font-weight="bold" fill="#1976d2" style="white-space: pre; font-size: 15px;">3</text>
+  <path class="shadow" d="M200,460 L600,520 L1000,460 L600,580 Z"/>
+  <rect class="agent" x="500" y="500" width="200" height="80" rx="5"/>
+  <text class="text" x="600" y="535" text-anchor="middle" font-weight="bold" style="white-space: pre;">Route Optimizer</text>
+  <text class="text" x="600" y="555" text-anchor="middle" style="white-space: pre;">Expert</text>
+  <text class="text" x="600" y="570" text-anchor="middle" font-size="12" style="white-space: pre;">[ScrapeWebsite, TomTom]</text>
+  <rect class="task" x="519.31" y="686.662" width="160" height="40" rx="5"/>
+  <text class="text" x="598.583" y="711.077" text-anchor="middle" style="white-space: pre; font-size: 15px;">Traffic Data Integration</text>
+  <text class="text" style="fill: rgb(25, 118, 210); font-weight: 700; white-space: pre; font-size: 15px;" x="507.259" y="693.779">4</text>
+  <rect class="task" x="525.249" y="791.637" width="160" height="40" rx="5"/>
+  <text class="text" x="606.142" y="816.292" text-anchor="middle" style="white-space: pre; font-size: 15px;">Route Optimization</text>
+  <text class="text" x="512.891" y="794.877" font-weight="bold" fill="#1976d2" style="white-space: pre; font-size: 15px;">5</text>
+  <rect class="task" x="504.99" y="1051.86" width="206.884" height="40" rx="5" style=""/>
+  <text class="text" x="605.933" y="1075.7" text-anchor="middle" style="white-space: pre; font-size: 15px;">Stakeholder Communication</text>
+  <text class="text" x="492.295" y="1054.66" font-weight="bold" fill="#1976d2" style="white-space: pre; font-size: 15px;">6</text>
+  <rect class="agent" x="509.742" y="868.362" width="200" height="80" rx="5"/>
+  <text class="text" x="609.742" y="903.362" text-anchor="middle" font-weight="bold" style="white-space: pre; font-size: 15px;">Notifications Manager</text>
+  <text class="text" x="609.742" y="923.362" text-anchor="middle" style="white-space: pre; font-size: 15px;">Alerts &amp; Reports</text>
+  <text class="text" x="609.742" y="938.362" text-anchor="middle" font-size="12" style="white-space: pre; font-size: 12px;">[ReportGenerator]</text>
+  <rect class="tool" x="921.411" y="420.396" width="160" height="40" rx="5"/>
+  <text class="text" x="1001.41" y="445.396" text-anchor="middle" font-style="italic" style="white-space: pre; font-size: 15px;">Local Inventory Tool</text>
+  <rect class="tool" x="520.554" y="605.819" width="160" height="40" rx="5"/>
+  <text class="text" x="600.84" y="630.491" text-anchor="middle" font-style="italic" style="white-space: pre; font-size: 15px;">TomTom Traffic Tool</text>
+  <rect class="tool" x="529.389" y="979.229" width="160" height="40" rx="5"/>
+  <text class="text" x="607.735" y="1003.94" text-anchor="middle" font-style="italic" style="white-space: pre; font-size: 15px;">Report Generator Tool</text>
+  <path class="connection" d="M600,200 L600,230"/>
+  <path class="connection" d="M 599.09 268.65 L 599.09 339.203 L 298.853 339.203" style=""/>
+  <path class="connection" d="M 599.193 268.648 L 599.193 339.201 L 901.299 339.201" style=""/>
+  <path class="connection" d="M200,380 L200,420"/>
+  <path class="connection" d="M1000,380 L1000,420"/>
+  <path class="connection" d="M 200 460 L 200 520 L 279.748 520" style=""/>
+  <path class="connection" d="M 1000 460 L 1000 520 L 909.342 520" style=""/>
+  <path class="connection" d="M 598.283 644.764 L 598.283 688.437" style=""/>
+  <path class="connection" d="M 452.269 519.886 L 501.04 519.886" style=""/>
+  <path class="connection" d="M 606.901 835.883 L 606.901 865.883"/>
+  <path class="connection" d="M 608.128 1020.45 L 608.128 1050.45"/>
+  <path class="connection" d="M 602.968 729.865 L 602.968 789.865"/>
+  <path class="connection" d="M 596.747 576.553 L 596.747 606.553"/>
+  <path class="connection" d="M 701.044 522.155 L 748.998 522.156" style="transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(-1, 0, 0, -1, 0.000037, -0.000011)"/>
+  <rect class="tool" x="119.325" y="417.539" width="180" height="40" rx="5"/>
+  <text class="text" x="203.335" y="443.861" text-anchor="middle" font-style="italic" style="white-space: pre; font-size: 15px;">ScrapeWebsite</text>
+  <path class="connection" d="M 608.629 950.926 L 608.629 980.926"/>
+  <rect class="agent" x="793.771" y="1028.41" width="200" height="80" rx="5" style="fill: rgb(252, 253, 227); stroke: rgb(210, 25, 25);"/>
+  <text class="text" x="890.741" y="1071.05" text-anchor="middle" font-weight="bold" style="white-space: pre; font-size: 15px;">HTML Report</text>
+  <path class="connection" d="M 712.159 1072.77 L 791.861 1072.77" style=""/>
+</svg>
