@@ -1,8 +1,8 @@
 <img src="logo2.png" alt="OLAF Logo" width="200"/>
 
-# OLAF - AI-Driven Snow Removal Optimization System
+# OLAF - Optimized Logistic via Agent Framework
 
-OLAF (Optimization for Local Area Facilities) is an advanced AI-driven system designed to optimize snow removal operations for municipalities and contractors. Using CrewAI technology, it orchestrates multiple specialized AI agents to coordinate and optimize all aspects of snow removal operations.
+OLAF (Optimized Logistic via Agent Framework) is an advanced AI-driven system designed to optimize snow removal operations for municipalities and contractors. Using CrewAI technology, it orchestrates multiple specialized AI agents to coordinate and optimize all aspects of snow removal operations.
 
 ## Features
 
