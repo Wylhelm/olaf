@@ -1,97 +1,78 @@
-<img src="logo.webp" width="300" alt="OLAF Logo">
+<img src="logo2.png" alt="OLAF Logo" width="200"/>
 
-# OLAF - Optimized Logistic via Agent Framework
+# OLAF - AI-Driven Snow Removal Optimization System
 
-OLAF (Optimized Logistic via Agent Framework) is an intelligent snow removal management system built using CrewAI that helps municipalities and contractors optimize their snow removal operations through AI-driven decision making.
-
-## Overview
-
-OLAF uses a crew of specialized AI agents working together to handle different aspects of snow removal operations:
-
-- **Global Planner**: Oversees and coordinates overall snow removal strategy
-- **Weather Monitor**: Tracks and analyzes weather conditions and forecasts
-- **Stock Resources Manager**: Manages inventory of salt and fuel resources
-- **Route Optimizer**: Determines optimal snow removal routes
-- **Notifications Manager**: Handles stakeholder communications and alerts
+OLAF (Optimization for Local Area Facilities) is an advanced AI-driven system designed to optimize snow removal operations for municipalities and contractors. Using CrewAI technology, it orchestrates multiple specialized AI agents to coordinate and optimize all aspects of snow removal operations.
 
 ## Features
 
-- **Weather Integration**: Real-time weather data collection and analysis
-- **Traffic Analysis**: Integration of traffic data for route optimization
-- **Resource Management**: 
-  - Tracking of salt and fuel inventory levels
-  - Smart resource allocation based on weather conditions
-- **Route Optimization**: AI-powered route planning considering multiple factors
-- **Stakeholder Communication**: Automated report generation and notifications
-- **Multiple Operation Modes**:
-  - Run: Execute snow removal optimization
-  - Train: Train the AI crew with historical data
-  - Test: Evaluate system performance
-  - Replay: Review previous operations
+- 🌨️ Real-time weather monitoring and forecasting
+- 🚛 Dynamic route optimization with traffic integration
+- 📊 Resource and inventory management
+- 📱 Interactive HTML reporting and stakeholder communication
+- 🤖 AI-powered decision making and coordination
+- 🗺️ TomTom traffic data integration
+- 📈 Automated resource allocation
+- ⚡ Real-time operational adjustments
 
-## Installation
+## System Architecture
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/olaf.git
-cd olaf
-```
+OLAF employs a multi-agent system using CrewAI, with each agent specializing in specific aspects of snow removal operations:
 
-2. Set up a conda environment (recommended):
-```bash
-conda create -n olaf python=3.10
-conda activate olaf
-```
+### Agents
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-conda install plotly  # Required for report generation
-```
+1. **Global Planification Coordinator**
+   - Orchestrates overall operations
+   - Coordinates between all agents
+   - Makes strategic decisions based on integrated data
 
-4. Copy the example environment file and configure your settings:
-```bash
-cp .env.example .env
-```
+2. **Weather Monitoring Specialist**
+   - Monitors real-time weather conditions
+   - Analyzes snow accumulation patterns
+   - Predicts weather impacts on operations
 
-## Usage
+3. **Stock and Resources Manager**
+   - Tracks inventory levels
+   - Optimizes resource distribution
+   - Prevents resource shortages
 
-OLAF can be run using the crewai command-line tool:
+4. **Route Optimization Expert**
+   - Creates efficient snow removal routes
+   - Integrates traffic and weather data
+   - Adapts routes in real-time
 
-```bash
-# Regular execution
-crewai run
+5. **Notifications and Alerts Manager**
+   - Generates interactive HTML reports
+   - Maintains stakeholder communications
+   - Creates visual data representations
 
-# Training mode
-crewai train <iterations> <filename>
+### Tasks
 
-# Test mode
-crewai test <iterations> <model_name>
+The system executes the following sequential tasks:
 
-# Replay mode
-crewai replay <task_id>
+1. **Global Planning**
+   - Creates high-level strategy
+   - Coordinates all operational aspects
 
-### Alternative Setup (Manual)
+2. **Weather Data Collection**
+   - Gathers comprehensive weather data
+   - Analyzes conditions and forecasts
 
-If you encounter any issues with the crewai command, you can use the provided shell script:
+3. **Traffic Data Integration**
+   - Monitors real-time traffic conditions
+   - Identifies road closures and incidents
 
-1. Make the script executable:
-```bash
-chmod +x run_crew.sh
-```
+4. **Resource Monitoring**
+   - Tracks inventory levels
+   - Calculates resource requirements
 
-2. Create an alias in your shell configuration (e.g., .zshrc or .bashrc):
-```bash
-alias crewai="/path/to/olaf/run_crew.sh"
-```
+5. **Route Optimization**
+   - Generates efficient routes
+   - Considers all operational factors
 
-3. Reload your shell configuration:
-```bash
-source ~/.zshrc  # or source ~/.bashrc
-```
-
-The script automatically sets up the required environment variables and allows you to use all crewai parameters normally.
-```
+6. **Stakeholder Communication**
+   - Produces interactive reports
+   - Sends automated alerts
 
 ## Project Structure
 
@@ -99,43 +80,119 @@ The script automatically sets up the required environment variables and allows y
 olaf/
 ├── src/
 │   └── ai_driven_snow_removal_optimization_for_municipalities_and_contractors/
-│       ├── crew.py           # Core CrewAI implementation
-│       ├── main.py          # Entry point and execution modes
-│       ├── tools/           # Custom tools
-│       │   ├── local_inventory_tool.py    # Resource inventory management
-│       │   └── report_generator_tool.py   # HTML report generation
-│       └── config/          # Configuration files
-├── reports/                 # Generated HTML reports
-├── knowledge/              # Knowledge base
-└── db/                     # Database files
+│       ├── config/
+│       │   ├── agents.yaml     # Agent configurations and roles
+│       │   └── tasks.yaml      # Task definitions and workflows
+│       ├── tools/
+│       │   ├── custom_tool.py
+│       │   ├── local_inventory_tool.py
+│       │   ├── report_generator_tool.py
+│       │   ├── tomtom_traffic_tool.py
+│       │   └── weather_data_tool.py
+│       ├── __init__.py
+│       ├── crew.py            # Core CrewAI implementation
+│       ├── main.py           # Main execution script
+│       ├── fuel_inv.json     # Fuel inventory tracking
+│       └── salt_inv.json     # Salt inventory tracking
+├── reports/                  # Generated HTML reports
+├── knowledge/               # Knowledge base
+├── db/                      # Database files
+├── requirements.txt         # Project dependencies
+├── pyproject.toml          # Project configuration
+├── .env.example            # Environment variables template
+└── README.md               # Project documentation
 ```
 
-## Tools
+## Installation
 
-### Local Inventory Tool
-- Manages and queries local inventory of resources (salt and fuel)
-- Supports semantic search of inventory data
-- Maintains real-time inventory levels
+1. Clone the repository:
+```bash
+git clone https://github.com/Wylhelm/olaf.git
+cd olaf
+```
 
-### Report Generator Tool
-- Generates formatted HTML reports
-- Includes timestamps and operation details
-- Provides clean, professional layout for stakeholder communication
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Create a `.env` file based on `.env.example` and add your API keys:
+```
+OPENAI_API_KEY=your-openai-api-key
+ANTHROPIC_API_KEY=your-anthropic-api-key
+TOMTOM_API_KEY=your-tomtom-api-key
+OPENWEATHER_API_KEY=your-openweather-api-key
+```
+
+## Usage
+
+OLAF provides several operational modes:
+
+### Run Mode
+Execute the main operational workflow:
+```bash
+crew ai run
+```
+
+### Training Mode
+Train the crew for a specified number of iterations:
+```bash
+python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main train <iterations> <filename>
+```
+
+### Replay Mode
+Replay execution from a specific task:
+```bash
+python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main replay <task_id>
+```
+
+### Test Mode
+Test execution with different models:
+```bash
+python -m src.ai_driven_snow_removal_optimization_for_municipalities_and_contractors.main test <iterations> <model_name>
+```
+
+## Tools and Integrations
+
+OLAF integrates several external services and tools:
+
+- **WeatherDataTool**: Interfaces with OpenWeather API for real-time weather data
+- **TomTomTrafficTool**: Utilizes TomTom's API for traffic data and route optimization
+- **LocalInventoryTool**: Manages local resource inventory tracking
+- **ReportGeneratorTool**: Creates interactive HTML reports
+- **ScrapeWebsiteTool**: Gathers additional data from online sources
+- **JSONSearchTool**: Processes and analyzes JSON data
 
 ## Configuration
 
-The system uses several configuration files:
+The system uses YAML configuration files for agents and tasks:
 
-- `.env`: Environment variables and API keys
-- `config/agents.yaml`: Agent configurations and roles
-- `config/tasks.yaml`: Task definitions and parameters
+- `config/agents.yaml`: Defines agent roles, goals, and capabilities
+- `config/tasks.yaml`: Specifies task descriptions and workflows
 
-## Reports
+## Required API Keys
 
-Reports are automatically generated in HTML format and stored in the `reports/` directory. Each report includes:
-- Timestamp of generation
-- Operation details
-- Resource usage
-- Route optimizations
-- Weather conditions
-- Stakeholder notifications
+The following API keys are required for full functionality:
+
+- OpenAI API key (for GPT models)
+- Anthropic API key (for Claude models)
+- TomTom API key (for traffic data)
+- OpenWeather API key (for weather data)
+
+## Output
+
+OLAF generates detailed HTML reports in the `reports/` directory, including:
+
+- Current weather conditions and forecasts
+- Optimized route maps with traffic overlay
+- Resource inventory status
+- Operational recommendations
+- Progress tracking
+
+## License
+
+MIT
+
+## Contributors
+
+Cgi Innovation & Immersive Systems Community
