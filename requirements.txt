@@ -1,7 +1,11 @@
-crewai[tools]
-python-dotenv
-requests>=2.31.0
-openai>=1.0.0
-plotly>=5.18.0
-pandas>=2.1.0
-jinja2>=3.1.2  # Required for HTML template rendering
+crewai[tools]   # Core CrewAI framework with tools support
+python-dotenv   # Environment variable management
+requests        # HTTP client for API interactions
+openai          # OpenAI API integration for GPT models
+plotly          # Interactive visualization library
+pandas          # Data manipulation and analysis
+jinja2          # Required for HTML template rendering
+anthropic       # Required for Claude models
+chromadb        # Required for database operations
+pyyaml          # Required for YAML configuration files
+plotly          # Required for reports generation
