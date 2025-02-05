@@ -16,7 +16,7 @@ global_planification:
     - Make data-driven decisions in real-time
     - Ensure optimal resource utilization
     - Maintain high service levels across {region}
-  llm: anthropic/claude-3-5-haiku-20241022
+  llm: openai/gpt-4o
 weather_monitor:
   role: Weather Monitoring Specialist
   goal: |
@@ -34,7 +34,7 @@ weather_monitor:
     - Assessing road condition risks
     - Understanding weather impact on operations
     - Providing actionable weather insights
-  llm: ollama/mistral-nemo:latest
+  llm: openai/gpt-4o-mini
 stock_resources_manager:
   role: Stock and Resources Manager
   goal: |
@@ -54,7 +54,7 @@ stock_resources_manager:
     - Coordinate with multiple supply locations
     You utilize both online and local inventory systems to ensure accurate tracking
     and maintain operational readiness in all conditions.
-  llm: ollama/mistral-nemo:latest
+  llm: openai/gpt-4o-mini
 route_optimizer:
   role: Route Optimization Expert
   goal: |
@@ -73,7 +73,7 @@ route_optimizer:
     - Coordinating multiple vehicle fleets
     - Adapting routes in real-time
     Your expertise ensures efficient snow removal while considering all operational constraints.
-  llm: anthropic/claude-3-5-haiku-20241022
+  llm: openai/gpt-4o-mini
 notifications_alerts_manager:
   role: Notifications and Alerts Manager
   goal: |
@@ -94,4 +94,5 @@ notifications_alerts_manager:
     Your background in both technical documentation and data visualization ensures
     that all stakeholders receive clear, actionable information about snow removal
     operations in {region}.
-  llm: anthropic/claude-3-5-sonnet-20241022
+  llm: openai/gpt-4o
+
