@@ -1,107 +1,193 @@
 ---
 global_planning:
-  description: Analyze overall situation and create high-level strategy for snow removal operations in {region}, coordinating between weather, traffic, resources, and route optimization aspects.
-  expected_output: A comprehensive strategic plan for {region} that includes weather considerations, resource allocation guidelines, and high-level routing strategies.
+  description: |
+    Create a comprehensive snow removal strategy for {region} by:
+    
+    1. Analyze Weather Conditions (using WeatherDataTool):
+       - Get current temperature and conditions.
+       - Check snowfall amounts and accumulation forecasts.
+       - Assess road surface temperatures.
+       - Monitor and verify weather alerts from multiple sources.
+       - Validate data quality and flag discrepancies.
+    
+    2. Evaluate Traffic Situation (using TomTomTrafficTool):
+       - Monitor real-time traffic conditions.
+       - Identify road closures, incidents, and bottlenecks.
+       - Analyze traffic patterns and peak congestion periods.
+       - Integrate weather impact on traffic (e.g., delays due to snow/ice).
+       - Recommend alternative routes in case of disruptions.
+    
+    3. Assess Resource Availability (using LocalInventoryTool):
+       - Query current fuel and salt inventory levels (ensuring correct unit formats).
+       - Monitor equipment availability and service status.
+       - Track resource consumption rates and compare against historical data.
+       - Project resource needs based on current weather forecasts.
+       - Validate data and escalate errors or low-stock alerts immediately.
+    
+    4. Integrate All Data Sources:
+       - Combine weather, traffic, and inventory data into a unified dashboard.
+       - Identify high-priority areas using risk and impact analysis.
+       - Determine optimal resource allocation based on validated data.
+       - Create contingency plans and backup strategies for severe conditions.
+       - Establish clear communication protocols among teams.
+    
+    5. Generate Comprehensive Strategy:
+       - Define priority zones based on weather severity and traffic data.
+       - Allocate resources and schedule deployments accordingly.
+       - Plan routes considering current traffic conditions and weather impact.
+       - Establish a timeline for operations with built-in safety buffers.
+       - Include emergency response plans and backup strategies.
+       - Document communication protocols and decision checkpoints.
+
+  expected_output: |
+    A detailed strategic plan that includes:
+    1. Weather Analysis:
+       - Current conditions, forecasts, and validated alerts.
+       - Snow accumulation predictions and risk assessments.
+       - Road surface temperature mapping.
+    
+    2. Traffic Integration:
+       - Real-time traffic conditions with incident details.
+       - Identification of closures and bottlenecks.
+       - Analysis of peak periods and recommended detours.
+    
+    3. Resource Allocation:
+       - Current inventory levels (with standardized units).
+       - Consumption rate analysis and historical comparisons.
+       - Projected resource needs and low inventory alerts.
+       - Replenishment and distribution schedules.
+    
+    4. Operational Strategy:
+       - Defined priority zones and risk levels.
+       - Detailed resource deployment and route optimization plans.
+       - Contingency procedures and emergency response protocols.
+    
+    5. Timeline and Coordination:
+       - Operation start times and expected completion estimates.
+       - Team assignments and inter-agent communication schedules.
+       - Clear escalation and feedback protocols.
+
   allow_delegation: true
   agent: global_planification
 
 weather_data_collection:
   description: |
-    Gather comprehensive weather data for {region} using the WeatherDataTool to collect:
-    - Current temperature and conditions
-    - Snowfall amounts and accumulation
-    - Road surface temperature estimates
-    - Weather forecasts and alerts
-    This data will be used for route optimization and resource planning.
+    Gather comprehensive weather data for {region} using the WeatherDataTool:
+    - Collect current temperature, humidity, and atmospheric conditions.
+    - Retrieve snowfall amounts, accumulation forecasts, and radar/sensor data.
+    - Assess road surface temperature estimates.
+    - Monitor weather alerts and cross-check with alternative sources.
+    - Validate forecast data against historical trends and local sensors.
+    This data will be used to support route planning and resource allocation.
   expected_output: |
-    Detailed weather analysis for {region} including:
-    - Current weather conditions
-    - Snow accumulation data
-    - Road surface conditions
-    - 24-hour forecast
-    - Weather-related alerts
+    A detailed weather analysis report for {region} including:
+    - Current weather conditions and validated alerts.
+    - Detailed snowfall and accumulation predictions.
+    - Road surface condition mapping.
+    - A 24-hour forecast with confidence levels.
   agent: weather_monitor
   context:
     - global_planning
+
 traffic_data_integration:
   description: |
-    Collect and analyze traffic data for {region} using TomTomTrafficTool to:
-    - Monitor real-time traffic conditions
-    - Identify road closures and incidents
-    - Track traffic flow patterns
-    - Consider weather impact on traffic
-    This data will be integrated with weather conditions for optimal route planning.
+    Collect and analyze traffic data for {region} using TomTomTrafficTool:
+    - Monitor real-time traffic conditions.
+    - Identify road closures, incidents, and potential hazards.
+    - Analyze traffic flow patterns and congestion trends.
+    - Correlate traffic data with weather information to detect impact.
+    - Recommend alternative routes when critical incidents are detected.
+    - Validate and cross-reference incident reports with historical data.
   expected_output: |
-    Comprehensive traffic analysis including:
-    - Current traffic conditions
-    - Identified incidents and closures
-    - Traffic flow patterns
-    - Weather-impacted routes
-    - Recommended route adjustments
+    A comprehensive traffic analysis report including:
+    - Current traffic conditions and speed metrics.
+    - A list of incidents, closures, and their severities.
+    - Traffic flow patterns and predicted congestion periods.
+    - Recommended adjustments and alternative routing options.
   agent: route_optimizer
   context:
     - weather_data_collection
+
 resource_monitoring:
   description: |
-    Monitor and manage resource inventory using LocalInventoryTool and online sources:
-    - Track salt and fuel inventory levels
-    - Monitor usage rates based on weather conditions
-    - Calculate resource requirements for planned routes
-    - Generate alerts for low inventory levels
-    - Recommend resource allocation based on weather forecast
+    Monitor and manage resource inventory using LocalInventoryTool:
+    
+    1. Check current inventory levels:
+       - Query: "fuel current_level" in "fuel_inv.json" (ensure numeric formats are standardized).
+       - Query: "salt current_level" in "salt_inv.json".
+    
+    2. Analyze usage patterns:
+       - Query: "usage_rate" in each inventory file.
+       - Compare against historical usage and forecasted needs.
+       - Use tool suggestions if the initial query fails.
+    
+    3. Monitor thresholds:
+       - Compare current levels against defined thresholds.
+       - Generate alerts for low inventory and trigger escalation protocols.
+       - Use suggested search paths if initial query returns no results.
+    
+    4. Project resource needs:
+       - Calculate future needs based on upcoming weather forecasts.
+       - Integrate historical usage trends to refine projections.
+       - Adapt queries based on tool feedback and error messages.
+    
+    Expected behavior:
+    - Validate data types and unit consistency.
+    - Log and report any discrepancies for immediate action.
+    - Provide fallback queries when initial search fails.
   expected_output: |
-    Detailed resource status report including:
-    - Current inventory levels for all resources
-    - Usage rate analysis
-    - Projected needs based on weather forecast
-    - Low inventory alerts
-    - Resource allocation recommendations
-    - Data source verification (online/local)
+    A detailed resource status report including:
+    - Current inventory levels (standardized units) for fuel and salt.
+    - Analysis of consumption rates and projected needs.
+    - Low inventory alerts with escalation recommendations.
+    - Resource allocation recommendations and source verification.
   agent: stock_resources_manager
   context:
     - global_planning
+
 route_optimization:
   description: |
-    Optimize snow removal routes by integrating:
-    - Current weather conditions and forecasts
-    - Real-time traffic data and incidents
-    - Resource availability and locations
-    - Road priority levels
-    - Historical performance data
-    Generate efficient routes that consider all factors affecting snow removal operations.
+    Optimize snow removal routes by integrating data from:
+    - Current weather conditions and updated forecasts.
+    - Real-time traffic data including incidents and closures.
+    - Resource availability (inventory levels and equipment status).
+    - Road priority levels and historical performance data.
+    - Local regulatory and safety requirements.
+    Additional tasks:
+    - Validate route calculations against historical data.
+    - Suggest contingency routes and detours for high-risk areas.
+    - Incorporate dynamic updates as new data arrives.
   expected_output: |
-    Comprehensive route optimization plan including:
-    - Optimized routes for each vehicle
-    - Priority-based scheduling
-    - Resource allocation per route
-    - Estimated completion times
-    - Alternative routes for contingencies
-    - Weather and traffic impact analysis
+    A comprehensive route optimization plan including:
+    - Optimized routes for each vehicle with estimated travel times.
+    - Priority-based scheduling and resource allocation per route.
+    - Alternative routes for contingencies.
+    - Detailed analysis of weather and traffic impacts on routing.
+    - Safety and regulatory compliance checks.
   agent: route_optimizer
   context:
-  - global_planning
-  - weather_data_collection
-  - traffic_data_integration
+    - global_planning
+    - weather_data_collection
+    - traffic_data_integration
+
 stakeholder_communication:
   description: |
     Generate comprehensive reports and alerts using the enhanced ReportGeneratorTool:
-    - Create interactive HTML reports with visualizations
-    - Generate weather condition maps and forecasts
-    - Display route optimization maps with traffic overlay
-    - Show resource inventory levels with visual indicators
-    - Provide operational recommendations with supporting data
-    - Include priority-based schedules and completion estimates
+    - Create interactive HTML reports with clear visualizations.
+    - Include weather condition maps, traffic overlays, and inventory dashboards.
+    - Provide detailed operational recommendations with data-driven justifications.
+    - Include priority-based schedules, completion estimates, and contingency plans.
+    - Establish real-time alerts for critical updates via multiple communication channels (e.g., email, SMS, internal dashboards).
+    - Incorporate a feedback mechanism to capture stakeholder responses and adjust operations accordingly.
   expected_output: |
-    Interactive HTML report containing:
-    - Visual weather dashboard with current conditions and forecasts
-    - Interactive maps showing optimized routes and traffic conditions
-    - Resource inventory visualizations with status indicators
-    - Operational timeline and progress tracking
-    - Detailed recommendations with data-driven justifications
-    - Automated alerts for critical updates
-    - Mobile-responsive design for field access
+    An interactive, mobile-responsive HTML report that includes:
+    - A visual weather dashboard with current conditions, forecasts, and alert levels.
+    - Interactive maps showing optimized routes, traffic incidents, and suggested detours.
+    - Inventory visualizations with current levels, usage rates, and alerts.
+    - An operational timeline with team assignments, milestones, and contingency procedures.
+    - Automated alerts and a real-time communication feed for stakeholders.
   agent: notifications_alerts_manager
   context:
-  - global_planning
-  - resource_monitoring
-  - route_optimization
+    - global_planning
+    - resource_monitoring
+    - route_optimization

@@ -48,7 +48,7 @@ class TomTomTrafficTool(BaseTool):
         self.api_key = os.getenv('TOMTOM_API_KEY')
         if not self.api_key:
             raise ValueError("TOMTOM_API_KEY environment variable is required")
-        
+
     def _get_traffic_incidents(self, bbox: str) -> dict:
         """Get traffic incidents in the specified bounding box."""
         endpoint = f"{self.base_url}/traffic/services/5/incidentDetails"
@@ -61,7 +61,7 @@ class TomTomTrafficTool(BaseTool):
             'categoryFilter': 'Accident,RoadClosed,RoadWorks,Jam',
             'timeValidityFilter': 'present'
         }
-        
+
         response = requests.get(endpoint, params=params)
         response.raise_for_status()
         return response.json()
@@ -110,16 +110,7 @@ class TomTomTrafficTool(BaseTool):
         return response.json()
 
     def _run(self, region: str, route_type: str = "fastest") -> str:
-        """
-        Main execution method for the tool.
-        
-        Args:
-            region: The region to analyze
-            route_type: Type of route optimization (fastest/shortest)
-            
-        Returns:
-            JSON string containing traffic data, incidents, and optimized route
-        """
+        """Main execution method for the tool."""
         try:
             # Get coordinates for the region
             coordinates = self.region_coordinates.get(region)
@@ -128,33 +119,39 @@ class TomTomTrafficTool(BaseTool):
                     "error": "Invalid region",
                     "details": f"Region '{region}' not found. Available regions: {list(self.region_coordinates.keys())}"
                 })
-            
+
             # Calculate bounding box for the region based on coordinates
             lats = [coord[0] for coord in coordinates]
             lons = [coord[1] for coord in coordinates]
-            # Format bbox as minLon,minLat,maxLon,maxLat with 6 decimal places
             min_lon = max(min(lons), -180)
             max_lon = min(max(lons), 180)
             min_lat = max(min(lats), -90)
             max_lat = min(max(lats), 90)
             bbox = f"{min_lon:.6f},{min_lat:.6f},{max_lon:.6f},{max_lat:.6f}"
-            
+
             # Gather all required data
             incidents = self._get_traffic_incidents(bbox)
             route = self._calculate_route(coordinates, route_type)
             flow = self._get_traffic_flow(coordinates)
-            
+
+            # Summarized logging instead of full JSON dump
+            incident_count = len(incidents.get('incidents', []))
+            road_closures = sum(1 for i in incidents.get('incidents', []) if i['properties'].get('iconCategory') == 6)
+
+            print(f"Traffic Report: {incident_count} incidents, {road_closures} road closures detected.")
+
             # Compile results
             result = {
                 "timestamp": datetime.now().isoformat(),
                 "region": region,
-                "traffic_incidents": incidents,
+                "incident_count": incident_count,
+                "road_closures": road_closures,
                 "optimized_route": route,
                 "traffic_flow": flow
             }
-            
+
             return json.dumps(result, indent=2)
-            
+
         except requests.exceptions.RequestException as e:
             return json.dumps({
                 "error": "Traffic API request failed",

@@ -7,7 +7,8 @@ from pathlib import Path
 # Load environment variables from .env file
 env_path = Path(__file__).parent / '.env'
 load_dotenv(env_path)
-from ai_driven_snow_removal_optimization_for_municipalities_and_contractors.crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
+#from ai_driven_snow_removal_optimization_for_municipalities_and_contractors.crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
+from .crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
 
 def run():
     """

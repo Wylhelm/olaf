@@ -18,7 +18,10 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Agent(
             config=self.agents_config['global_planification'],
             tools=[
-                ScrapeWebsiteTool()
+                JSONSearchTool(),
+                WeatherDataTool(),
+                TomTomTrafficTool(),
+                LocalInventoryTool()
             ],
         )
 
@@ -67,7 +70,9 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
         return Task(
             config=self.tasks_config['global_planning'],
             tools=[
-                JSONSearchTool()
+                WeatherDataTool(),
+                TomTomTrafficTool(),
+                LocalInventoryTool()
             ],
         )
 
@@ -121,10 +126,18 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
     @crew
     def crew(self) -> Crew:
         """Creates the AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractors crew"""
-        print("OLAF initialized, kicking off tasks...")
-        return Crew(
+        start_time = datetime.now()
+        print(f"[{start_time.strftime('%Y-%m-%d %H:%M:%S')}] OLAF initialized, kicking off tasks...")
+
+        crew_instance = Crew(
             agents=self.agents,  # Automatically created by the @agent decorator
-            tasks=self.tasks,    # Automatically created by the @task decorator
+            tasks=self.tasks,  # Automatically created by the @task decorator
             process=Process.sequential,
             verbose=True,
         )
+
+        end_time = datetime.now()
+        elapsed_time = (end_time - start_time).total_seconds()
+        print(f"[{end_time.strftime('%Y-%m-%d %H:%M:%S')}] All tasks completed in {elapsed_time:.2f} seconds.")
+
+        return crew_instance

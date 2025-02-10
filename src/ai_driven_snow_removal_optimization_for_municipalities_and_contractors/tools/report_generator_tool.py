@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import plotly.io as pio
 
+
 class ReportGeneratorInput(BaseModel):
     tool_input: str = Field(
         description="A JSON string containing report data with weather, traffic, inventory, and recommendations sections",
@@ -40,12 +41,13 @@ class ReportGeneratorInput(BaseModel):
         }''']
     )
 
+
 class ReportGeneratorTool(BaseTool):
     name: str = "Generate HTML Report"
     args_schema: Type[BaseModel] = ReportGeneratorInput
     description: str = """
     A tool that generates an interactive HTML report with the provided content and visualizations.
-    
+
     Expected JSON structure:
     {
       "content": {
@@ -125,7 +127,7 @@ class ReportGeneratorTool(BaseTool):
         ]
       }
     }
-    
+
     Features:
     - Interactive weather visualizations
     - Traffic and route mapping
@@ -138,10 +140,10 @@ class ReportGeneratorTool(BaseTool):
         """Format weather dashboard section"""
         current = content.get('current_conditions', {})
         forecast = content.get('forecast', [])
-        
+
         # Create weather visualization
         fig = go.Figure()
-        
+
         # Add current conditions
         fig.add_trace(go.Indicator(
             mode="number+delta",
@@ -158,7 +160,7 @@ class ReportGeneratorTool(BaseTool):
             for f in forecast:
                 times.append(f.get('time', ''))
                 snow_amounts.append(float(f.get('expected_snow', '0').split()[0]))
-            
+
             fig.add_trace(go.Bar(
                 x=times,
                 y=snow_amounts,
@@ -174,7 +176,7 @@ class ReportGeneratorTool(BaseTool):
         )
 
         weather_plot = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-        
+
         return f"""
         <div class="section weather-section">
             <h2>Weather Dashboard</h2>
@@ -217,17 +219,17 @@ class ReportGeneratorTool(BaseTool):
         """Format traffic and route optimization section"""
         traffic_data = content.get('traffic_data', {})
         route_data = content.get('optimized_route', {})
-        
+
         # Create traffic incidents visualization
         incidents = traffic_data.get('traffic_incidents', [])
         if incidents:
             fig = go.Figure()
-            
+
             # Add incidents as scatter points on a map
             lats = [inc['location']['latitude'] for inc in incidents]
             lons = [inc['location']['longitude'] for inc in incidents]
             texts = [f"{inc['type']}: {inc['description']}" for inc in incidents]
-            
+
             fig.add_trace(go.Scattermapbox(
                 lat=lats,
                 lon=lons,
@@ -236,17 +238,17 @@ class ReportGeneratorTool(BaseTool):
                 text=texts,
                 textposition="top center"
             ))
-            
+
             fig.update_layout(
                 mapbox_style="carto-positron",
                 mapbox=dict(
-                    center=dict(lat=sum(lats)/len(lats), lon=sum(lons)/len(lons)),
+                    center=dict(lat=sum(lats) / len(lats), lon=sum(lons) / len(lons)),
                     zoom=12
                 ),
                 height=400,
                 margin=dict(t=0, b=0, l=0, r=0)
             )
-            
+
             traffic_map = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         else:
             traffic_map = ""
@@ -267,9 +269,9 @@ class ReportGeneratorTool(BaseTool):
                     </div>
                 </div>
             </div>
-            
+
             {traffic_map}
-            
+
             <div class="route-details">
                 <h3>Optimized Route Details</h3>
                 <div class="metric-item">
@@ -280,7 +282,7 @@ class ReportGeneratorTool(BaseTool):
                     <span class="label">Estimated Time:</span>
                     <span class="value">{route_data.get('travel_time', 'N/A')}</span>
                 </div>
-                
+
                 <h4>Route Segments</h4>
                 <div class="segments-container">
                     {''.join([f'''
@@ -306,22 +308,22 @@ class ReportGeneratorTool(BaseTool):
         usage = content.get('recent_usage', {})
         needs = content.get('projected_needs', {})
         alerts = content.get('low_inventory_alerts', {})
-        
+
         # Create inventory visualization
         fig = go.Figure()
-        
+
         # Add current levels vs thresholds
         resources = []
         current_levels = []
         thresholds = []
-        
+
         for resource, alert_info in alerts.items():
             resources.append(resource)
             current_level = float(alert_info['Current Level'].split()[0])
             threshold = float(alert_info['Threshold'].split()[0])
             current_levels.append(current_level)
             thresholds.append(threshold)
-        
+
         if resources:
             fig.add_trace(go.Bar(
                 name='Current Level',
@@ -329,30 +331,36 @@ class ReportGeneratorTool(BaseTool):
                 y=current_levels,
                 marker_color='#3498db'
             ))
-            
+
             fig.add_trace(go.Bar(
                 name='Threshold',
                 x=resources,
                 y=thresholds,
                 marker_color='#e74c3c'
             ))
-            
+
             fig.update_layout(
                 title='Resource Inventory Levels vs Thresholds',
                 barmode='group',
                 height=400,
                 margin=dict(t=50, b=50, l=50, r=50)
             )
-            
+
             inventory_plot = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         else:
             inventory_plot = ""
-        
+
+        print("[DEBUG] inventory_levels content:", json.dumps(inventory, indent=2))
+        if not inventory:
+            print("[ERROR] Inventory data is missing!")
+        else:
+            print(f"[DEBUG] Inventory Items Found: {list(inventory.keys())}")
+
         return f"""
         <div class="section inventory-section">
             <h2>Resource Inventory</h2>
             {inventory_plot}
-            
+
             <div class="inventory-details">
                 <h3>Current Inventory Levels</h3>
                 <div class="inventory-grid">
@@ -375,28 +383,25 @@ class ReportGeneratorTool(BaseTool):
         try:
             # Parse the input JSON string
             try:
+                # Expect tool_input to be a valid JSON string (as provided by the Pydantic model)
                 data = json.loads(tool_input)
-                if isinstance(data, str):
-                    data = json.loads(data)
-                if isinstance(data, dict) and 'tool_input' in data:
-                    data = json.loads(data['tool_input'])
             except json.JSONDecodeError as e:
                 return f"Error parsing JSON input: {str(e)}\nInput received: {tool_input}"
-            
+
             content = data.get('content', {})
             if not content:
                 return "Error: No content found in the input data"
-            
+
             # Get the project root directory
             project_root = Path(__file__).parent.parent.parent.parent
             reports_dir = project_root / 'reports'
             os.makedirs(reports_dir, exist_ok=True)
-            
+
             # Generate report filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f'snow_removal_report_{timestamp}.html'
             report_path = reports_dir / filename
-            
+
             # Process sections
             sections_html = ""
             for section in content.get('sections', []):
@@ -416,7 +421,7 @@ class ReportGeneratorTool(BaseTool):
                         </div>
                     </div>
                     """
-            
+
             html_content = f"""
             <!DOCTYPE html>
             <html lang="en">
@@ -433,13 +438,13 @@ class ReportGeneratorTool(BaseTool):
                         --text-color: #343a40;
                         --border-color: #dee2e6;
                     }}
-                    
+
                     * {{
                         margin: 0;
                         padding: 0;
                         box-sizing: border-box;
                     }}
-                    
+
                     body {{
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                         line-height: 1.6;
@@ -447,7 +452,7 @@ class ReportGeneratorTool(BaseTool):
                         color: var(--text-color);
                         padding: 2rem;
                     }}
-                    
+
                     .report-container {{
                         max-width: 1200px;
                         margin: 0 auto;
@@ -456,12 +461,12 @@ class ReportGeneratorTool(BaseTool):
                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
                     }}
-                    
+
                     h1, h2, h3, h4 {{
                         color: var(--primary-color);
                         margin-bottom: 1rem;
                     }}
-                    
+
                     h1 {{
                         background-color: var(--primary-color);
                         color: white;
@@ -469,93 +474,93 @@ class ReportGeneratorTool(BaseTool):
                         margin: 0;
                         text-align: center;
                     }}
-                    
+
                     .timestamp {{
                         text-align: right;
                         color: #6c757d;
                         padding: 1rem 2rem;
                         border-bottom: 1px solid var(--border-color);
                     }}
-                    
+
                     .section {{
                         padding: 2rem;
                         border-bottom: 1px solid var(--border-color);
                     }}
-                    
+
                     .conditions-grid, .inventory-grid, .forecast-grid {{
                         display: grid;
                         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                         gap: 1.5rem;
                         margin: 1.5rem 0;
                     }}
-                    
+
                     .condition-item, .inventory-item, .forecast-item, .route-segment {{
                         background-color: var(--background-color);
                         padding: 1.5rem;
                         border-radius: 8px;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                     }}
-                    
+
                     .label {{
                         color: #6c757d;
                         font-weight: 500;
                     }}
-                    
+
                     .value {{
                         font-weight: 600;
                         color: var(--primary-color);
                     }}
-                    
+
                     .risk-high {{ color: var(--accent-color); }}
                     .risk-medium {{ color: #f39c12; }}
                     .risk-low {{ color: #27ae60; }}
-                    
+
                     .recommendations {{
                         background-color: #e8f4f8;
                         padding: 1.5rem;
                         border-radius: 8px;
                         margin-top: 1rem;
                     }}
-                    
+
                     .plotly-graph-div {{
                         margin: 2rem 0;
                         border-radius: 8px;
                         overflow: hidden;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                     }}
-                    
+
                     .segments-container {{
                         display: flex;
                         flex-direction: column;
                         gap: 1rem;
                         margin-top: 1rem;
                     }}
-                    
+
                     .route-segment {{
                         background-color: var(--background-color);
                         padding: 1rem;
                         border-radius: 8px;
                     }}
-                    
+
                     .segment-time {{
                         margin-bottom: 0.5rem;
                         font-weight: 500;
                     }}
-                    
+
                     .segment-points {{
                         color: #666;
                         font-size: 0.9em;
                     }}
-                    
+
                     @media (max-width: 768px) {{
                         body {{
                             padding: 1rem;
                         }}
-                        
+
                         .section {{
                             padding: 1.5rem;
                         }}
-                        
+
                         .conditions-grid, .inventory-grid, .forecast-grid {{
                             grid-template-columns: 1fr;
                         }}
@@ -571,11 +576,18 @@ class ReportGeneratorTool(BaseTool):
             </body>
             </html>
             """
-            
-            with open(report_path, 'w', encoding='utf-8') as f:
-                f.write(html_content)
-                
+
+            print("[DEBUG] Final HTML Content:\n", html_content[:500])  # Print only the first 500 characters to check
+            try:
+                with open(report_path, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
+                print("[DEBUG] Report successfully written to file.")
+            except Exception as e:
+                print(f"[ERROR] Writing report failed: {e}")
+                return f"Error writing report: {str(e)}"
+
             return f"HTML report generated successfully: {report_path}"
-            
+
         except Exception as e:
+            print(f"[ERROR] Unexpected error: {e}")
             return f"Error generating report: {str(e)}\nInput received: {tool_input}"

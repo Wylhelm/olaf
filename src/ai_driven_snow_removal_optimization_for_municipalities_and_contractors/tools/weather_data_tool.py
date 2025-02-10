@@ -109,7 +109,7 @@ class WeatherDataTool(BaseTool):
         
         # Get snow amount if available
         if 'snow' in weather_data:
-            snow_conditions['snow_amount_mm'] = weather_data['snow'].get('3h', 0)
+            snow_conditions['snow_amount_mm'] = float(weather_data.get('snow', {}).get('3h', '0') or 0)
         
         # Assess snow risk based on temperature and precipitation
         temp = weather_data['main']['temp']

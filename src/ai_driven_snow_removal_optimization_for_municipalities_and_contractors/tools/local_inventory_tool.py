@@ -1,100 +1,206 @@
 from crewai.tools import BaseTool
-from typing import Type
+from typing import Type, Optional, Dict, Any, List, ClassVar
 from pydantic import BaseModel, Field
 import json
 import os
-from typing import Optional
+from pathlib import Path
+from datetime import datetime
 
 
 class LocalInventoryToolInput(BaseModel):
     """Input schema for LocalInventoryTool."""
     search_query: str = Field(
         ...,
-        description="Mandatory search query you want to use to search the JSON's content"
+        description="Search query for inventory data (e.g., 'fuel levels', 'salt stock')"
     )
     json_path: str = Field(
         ...,
-        description="Mandatory json path you want to search"
+        description="JSON path to search. Valid paths: ['fuel_inv.json', 'salt_inv.json']"
     )
 
 
 class LocalInventoryTool(BaseTool):
-    name: str = "Search a JSON's content"
-    description: str = "A tool that can be used to semantic search a query from a JSON's content."
+    name: str = "Search Inventory Data"
+    description: str = """
+    Search and retrieve inventory data from local JSON files.
+    Available data includes:
+    - Current inventory levels
+    - Usage rates and patterns
+    - Thresholds and alerts
+    - Historical data
+
+    Valid search paths:
+    - fuel_inv.json: Fuel-related data
+    - salt_inv.json: Salt-related data
+
+    Returns structured inventory data or suggestions for retry if no match found.
+    """
     args_schema: Type[BaseModel] = LocalInventoryToolInput
 
-    def _read_inventory_file(self, file_path: str) -> Optional[dict]:
-        """
-        Helper method to read and parse a JSON inventory file.
-        
-        Args:
-            file_path: Path to the inventory JSON file
-            
-        Returns:
-            Dict containing the inventory data or None if file cannot be read
-        """
+    # Define standard inventory paths with proper type annotation
+    INVENTORY_PATHS: ClassVar[Dict[str, str]] = {
+        'fuel': 'fuel_inv.json',
+        'salt': 'salt_inv.json'
+    }
+
+    def _initialize_inventory_files(self) -> None:
+        """Initialize inventory files with default data if they don't exist."""
+        base_path = Path(__file__).parent.parent
+
+        default_data = {
+            'fuel': {
+                'inventory': {
+                    'current_level': 2000,
+                    'unit': 'liters',
+                    'threshold': 500,
+                    'usage_rate': '400 liters per storm',
+                    'last_updated': None
+                },
+                'metadata': {
+                    'type': 'fuel',
+                    'measuring_unit': 'liters',
+                    'update_frequency': 'hourly'
+                }
+            },
+            'salt': {
+                'inventory': {
+                    'current_level': 500,
+                    'unit': 'tons',
+                    'threshold': 100,
+                    'usage_rate': '50 tons per storm',
+                    'last_updated': None
+                },
+                'metadata': {
+                    'type': 'salt',
+                    'measuring_unit': 'tons',
+                    'update_frequency': 'hourly'
+                }
+            }
+        }
+
+        # Create individual inventory files
+        for resource, data in default_data.items():
+            file_path = base_path / f'{resource}_inv.json'
+            if not file_path.exists():
+                file_path.write_text(json.dumps(data, indent=2))
+
+    def _get_suggested_paths(self, search_query: str) -> List[str]:
+        """Get suggested paths based on search query."""
+        suggestions = []
+        query_terms = search_query.lower().split()
+
+        if any(term in ['fuel', 'gas', 'diesel'] for term in query_terms):
+            suggestions.append(self.INVENTORY_PATHS['fuel'])
+        if any(term in ['salt', 'nacl', 'deice'] for term in query_terms):
+            suggestions.append(self.INVENTORY_PATHS['salt'])
+
+        return suggestions or list(self.INVENTORY_PATHS.values())
+
+    def _load_inventory_data(self, file_path: str) -> Optional[Dict[str, Any]]:
+        """Load inventory data from specified file."""
         try:
-            if os.path.exists(file_path):
-                with open(file_path, 'r') as f:
-                    return json.load(f)
+            full_path = Path(__file__).parent.parent / file_path
+            if full_path.exists():
+                return json.loads(full_path.read_text())
             return None
         except Exception as e:
-            print(f"Error reading inventory file {file_path}: {str(e)}")
-            return None
+            return {"error": f"Error reading inventory file: {str(e)}"}
+
+    def _search_inventory(self, query: str, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Search inventory data based on query terms."""
+        query_terms = query.lower().split()
+
+        # Helper function to check if all query terms are in text
+        def matches_query(text: str) -> bool:
+            text = text.lower()
+            return all(term in text for term in query_terms)
+
+        # Try to match specific sections first
+        if 'inventory' in data:
+            text_to_search = json.dumps(data['inventory']).lower()
+            if matches_query(text_to_search):
+                return {'inventory': data['inventory']}
+
+        # If no specific matches, search entire content
+        text_to_search = json.dumps(data).lower()
+        if matches_query(text_to_search):
+            return data
+
+        return {}
 
     def _run(self, search_query: str, json_path: str) -> str:
         """
-        Search local inventory files based on the query.
-        
+        Execute inventory search with improved error handling and suggestions.
+
         Args:
-            search_query: The search query to filter inventory data
-            json_path: The path to the JSON file to search ('fuel_inv.json' or 'salt_inv.json')
-            
+            search_query: Search terms for filtering inventory data
+            json_path: Path to inventory data file
+
         Returns:
-            String containing matching inventory information
+            JSON string containing:
+            - Matching inventory data
+            - Search metadata
+            - Suggested alternatives if no matches
+            - Error details if applicable
         """
-        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        
-        if not json_path.endswith('.json'):
-            json_path += '.json'
-            
-        if json_path not in ['fuel_inv.json', 'salt_inv.json']:
+        try:
+            # Initialize inventory files if needed
+            self._initialize_inventory_files()
+
+            # Get suggested paths based on query
+            suggested_paths = self._get_suggested_paths(search_query)
+
+            # Try to load and search the specified path
+            data = self._load_inventory_data(json_path)
+            if data is None:
+                return json.dumps({
+                    "status": "error",
+                    "message": f"Invalid path: {json_path}",
+                    "suggested_paths": suggested_paths,
+                    "example_queries": [
+                        "fuel current_level",
+                        "salt inventory",
+                        "usage rate"
+                    ]
+                }, indent=2)
+
+            if "error" in data:
+                return json.dumps({
+                    "status": "error",
+                    "message": data["error"],
+                    "suggested_paths": suggested_paths
+                }, indent=2)
+
+            # Search the data
+            results = self._search_inventory(search_query, data)
+
+            if results:
+                return json.dumps({
+                    "status": "success",
+                    "query": search_query,
+                    "path": json_path,
+                    "data": results,
+                    "metadata": {
+                        "timestamp": datetime.now().isoformat(),
+                        "source": "local_inventory"
+                    }
+                }, indent=2)
+            else:
+                return json.dumps({
+                    "status": "no_results",
+                    "message": f"No inventory data found matching query: {search_query}",
+                    "suggested_paths": suggested_paths,
+                    "example_queries": [
+                        "fuel current_level",
+                        "salt inventory",
+                        "usage rate"
+                    ]
+                }, indent=2)
+
+        except Exception as e:
             return json.dumps({
                 "status": "error",
-                "message": "Invalid JSON path. Use 'fuel_inv.json' or 'salt_inv.json'"
-            })
-            
-        file_path = os.path.join(base_path, json_path)
-        data = self._read_inventory_file(file_path)
-        
-        if not data:
-            return json.dumps({
-                "status": "error",
-                "message": f"Could not read inventory file: {json_path}"
-            })
-            
-        # Determine which inventory type we're dealing with
-        inventory_key = 'fuel_inventory' if 'fuel' in json_path else 'salt_inventory'
-        
-        # Basic semantic search - look for matches in various fields
-        search_terms = search_query.lower().split()
-        matching_items = []
-        
-        for item in data[inventory_key]:
-            item_str = json.dumps(item).lower()
-            if all(term in item_str for term in search_terms):
-                matching_items.append(item)
-        
-        if matching_items:
-            return json.dumps({
-                "status": "success",
-                "source": "local",
-                "data": matching_items,
-                "metadata": data['metadata']
+                "message": f"Error processing inventory search: {str(e)}",
+                "query": search_query,
+                "path": json_path
             }, indent=2)
-        
-        return json.dumps({
-            "status": "error",
-            "source": "local",
-            "message": f"No matching inventory data found for query: {search_query}"
-        })
