@@ -6,6 +6,7 @@ plotly          # Interactive visualization library
 pandas          # Data manipulation and analysis
 jinja2          # Required for HTML template rendering
 anthropic       # Required for Claude models
-chromadb        # Required for database operations
-pyyaml          # Required for YAML configuration files
-plotly          # Required for reports generation
+chromadb       # Required for database operations
+pyyaml         # Required for YAML configuration files
+plotly         # Required for reports generation
+folium         # Required for interactive maps

@@ -5,6 +5,8 @@ import requests
 import os
 from datetime import datetime
 import json
+import folium
+from pathlib import Path
 
 class TomTomTrafficToolInput(BaseModel):
     """Input schema for TomTomTrafficTool."""
@@ -109,6 +111,79 @@ class TomTomTrafficTool(BaseTool):
         response.raise_for_status()
         return response.json()
 
+    def _create_route_map(self, route_data: dict, incidents: dict, region: str) -> str:
+        """
+        Create an interactive map with the optimized route and incidents.
+        
+        Args:
+            route_data: Route data from TomTom API
+            incidents: Traffic incidents data
+            region: Region name
+            
+        Returns:
+            Path to the saved map HTML file
+        """
+        # Extract route coordinates from the response
+        try:
+            legs = route_data.get('routes', [{}])[0].get('legs', [])
+            if not legs:
+                return None
+                
+            # Get the center point of the route for initial map view
+            coordinates = self.region_coordinates.get(region, [[0, 0]])[0]
+            
+            # Create a map centered on the region
+            m = folium.Map(location=coordinates, zoom_start=12)
+            
+            # Plot the route
+            route_points = []
+            for leg in legs:
+                for point in leg.get('points', []):
+                    route_points.append([point.get('latitude'), point.get('longitude')])
+            
+            if route_points:
+                folium.PolyLine(
+                    route_points,
+                    weight=4,
+                    color='blue',
+                    opacity=0.8,
+                    tooltip='Snow Removal Route'
+                ).add_to(m)
+            
+            # Add markers for start and end points
+            if route_points:
+                folium.Marker(
+                    route_points[0],
+                    popup='Start',
+                    icon=folium.Icon(color='green', icon='info-sign')
+                ).add_to(m)
+                folium.Marker(
+                    route_points[-1],
+                    popup='End',
+                    icon=folium.Icon(color='red', icon='info-sign')
+                ).add_to(m)
+            
+            # Add incident markers
+            for incident in incidents.get('incidents', []):
+                coords = incident.get('geometry', {}).get('coordinates', [])
+                if coords:
+                    folium.Marker(
+                        [coords[1], coords[0]],  # TomTom uses [lon, lat], folium uses [lat, lon]
+                        popup=incident.get('properties', {}).get('iconCategory', 'Incident'),
+                        icon=folium.Icon(color='red', icon='warning-sign')
+                    ).add_to(m)
+            
+            # Save the map
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            map_path = Path('reports') / f'snow_removal_route_{region}_{timestamp}.html'
+            m.save(str(map_path))
+            
+            return str(map_path)
+            
+        except Exception as e:
+            print(f"Error creating map: {str(e)}")
+            return None
+
     def _run(self, region: str, route_type: str = "fastest") -> str:
         """
         Main execution method for the tool.
@@ -151,6 +226,19 @@ class TomTomTrafficTool(BaseTool):
                 "traffic_incidents": incidents,
                 "optimized_route": route,
                 "traffic_flow": flow
+            }
+            
+            # Create and save the route map
+            map_path = self._create_route_map(route, incidents, region)
+            
+            # Add map path to result if created successfully
+            result = {
+                "timestamp": datetime.now().isoformat(),
+                "region": region,
+                "traffic_incidents": incidents,
+                "optimized_route": route,
+                "traffic_flow": flow,
+                "map_path": map_path
             }
             
             return json.dumps(result, indent=2)
