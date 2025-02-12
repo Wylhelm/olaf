@@ -4,8 +4,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-# Load environment variables from .env file
-env_path = Path(__file__).parent / '.env'
+# Load environment variables from .env file in project root
+env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(env_path)
 #from ai_driven_snow_removal_optimization_for_municipalities_and_contractors.crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
 from .crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
