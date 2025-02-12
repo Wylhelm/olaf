@@ -23,18 +23,18 @@ class TomTomTrafficTool(BaseTool):
     
     # Region to coordinates mapping
     region_coordinates: Dict[str, List[List[float]]] = {
-        "Toronto": [
-            [43.6532, -79.3832],  # Downtown Toronto
-            [43.7046, -79.3590],  # North York
-            [43.6481, -79.4143],  # West Toronto
-            [43.6389, -79.3515]   # East Toronto
-        ],
-        "Montreal": [
-            [45.5017, -73.5673],  # Downtown Montreal
-            [45.5088, -73.5878],  # Plateau Mont-Royal
-            [45.4697, -73.6132],  # Westmount
-            [45.5461, -73.6369]   # Outremont
-        ],
+        # "Toronto": [
+        #     [43.6532, -79.3832],  # Downtown Toronto
+        #     [43.7046, -79.3590],  # North York
+        #     [43.6481, -79.4143],  # West Toronto
+        #     [43.6389, -79.3515]   # East Toronto
+        # ],
+        # "Montreal": [
+        #     [45.5017, -73.5673],  # Downtown Montreal
+        #     [45.5088, -73.5878],  # Plateau Mont-Royal
+        #     [45.4697, -73.6132],  # Westmount
+        #     [45.5461, -73.6369]   # Outremont
+        # ],
         "Quebec": [
             [46.8139, -71.2080],  # Old Quebec
             [46.8483, -71.2329],  # Saint-Roch

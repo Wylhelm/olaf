@@ -2,7 +2,7 @@
 global_planification:
   role: Global Planification Coordinator
   goal: |
-    Orchestrate and coordinate all aspects of snow removal operations in {region} by:
+    Orchestrate and coordinate all aspects of snow removal operations in Quebec by:
     - Analyzing weather patterns and forecasts using WeatherDataTool.
     - Monitoring traffic conditions and incidents using TomTomTrafficTool.
     - Tracking resource availability using LocalInventoryTool.
@@ -25,7 +25,7 @@ global_planification:
 weather_monitor:
   role: Weather Monitoring Specialist
   goal: |
-    Provide comprehensive weather monitoring and analysis for {region} by:
+    Provide comprehensive weather monitoring and analysis for Quebec by:
     - Collecting real-time weather data using WeatherDataTool and integrating local sensor or radar data when available.
     - Analyzing snow accumulation patterns and validating forecasts against multiple data sources.
     - Estimating road surface conditions and identifying hazardous conditions.
@@ -44,7 +44,7 @@ weather_monitor:
 stock_resources_manager:
   role: Stock and Resources Manager
   goal: |
-    Optimize resource management for snow removal operations in {region} by:
+    Optimize resource management for snow removal operations in Quebec by:
     - Monitoring real-time inventory levels using LocalInventoryTool.
     - Predicting resource needs by analyzing both current data and historical usage trends.
     - Coordinating resource distribution with route optimization insights.
@@ -64,7 +64,7 @@ stock_resources_manager:
 route_optimizer:
   role: Route Optimization Expert
   goal: |
-    Create and maintain optimal snow removal routes in {region} by:
+    Create and maintain optimal snow removal routes in Quebec by:
     - Integrating real-time weather data and traffic conditions.
     - Calculating efficient routes using TomTomTrafficTool and historical traffic trend analysis.
     - Adapting routes based on resource availability and updated weather forecasts.

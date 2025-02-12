@@ -10,7 +10,7 @@ class WeatherDataToolInput(BaseModel):
     """Input schema for WeatherDataTool."""
     region: str = Field(
         ...,
-        description="Region to get weather data for (e.g., Montreal, Toronto, Quebec)"
+        description="Region to get weather data for (e.g. Quebec)"
     )
     forecast_days: int = Field(
         default=1,
@@ -36,8 +36,8 @@ class WeatherDataTool(BaseTool):
     
     # Region to coordinates mapping (matching TomTomTrafficTool)
     region_coordinates: ClassVar[Dict[str, List[float]]] = {
-        "Toronto": [43.6532, -79.3832],
-        "Montreal": [45.5017, -73.5673],
+        #"Toronto": [43.6532, -79.3832],
+        #"Montreal": [45.5017, -73.5673],
         "Quebec": [46.8139, -71.2080]
     }
     

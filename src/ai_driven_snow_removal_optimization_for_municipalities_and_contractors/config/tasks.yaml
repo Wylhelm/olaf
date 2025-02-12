@@ -1,7 +1,7 @@
 ---
 global_planning:
   description: |
-    Create a comprehensive snow removal strategy for {region} by:
+    Create a comprehensive snow removal strategy for Quebec by:
     
     1. Analyze Weather Conditions (using WeatherDataTool):
        - Get current temperature and conditions.
@@ -72,7 +72,7 @@ global_planning:
 
 weather_data_collection:
   description: |
-    Gather comprehensive weather data for {region} using the WeatherDataTool:
+    Gather comprehensive weather data for Quebec using the WeatherDataTool:
     - Collect current temperature, humidity, and atmospheric conditions.
     - Retrieve snowfall amounts, accumulation forecasts, and radar/sensor data.
     - Assess road surface temperature estimates.
@@ -80,7 +80,7 @@ weather_data_collection:
     - Validate forecast data against historical trends and local sensors.
     This data will be used to support route planning and resource allocation.
   expected_output: |
-    A detailed weather analysis report for {region} including:
+    A detailed weather analysis report for {Quebec} including:
     - Current weather conditions and validated alerts.
     - Detailed snowfall and accumulation predictions.
     - Road surface condition mapping.
@@ -91,7 +91,7 @@ weather_data_collection:
 
 traffic_data_integration:
   description: |
-    Collect and analyze traffic data for {region} using TomTomTrafficTool:
+    Collect and analyze traffic data for Quebec using TomTomTrafficTool:
     - Monitor real-time traffic conditions.
     - Identify road closures, incidents, and potential hazards.
     - Analyze traffic flow patterns and congestion trends.

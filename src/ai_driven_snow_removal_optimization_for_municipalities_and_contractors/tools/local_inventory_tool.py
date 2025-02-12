@@ -27,11 +27,9 @@ class LocalInventoryTool(BaseTool):
     - Usage rates and patterns
     - Thresholds and alerts
     - Historical data
-
     Valid search paths:
     - fuel_inv.json: Fuel-related data
     - salt_inv.json: Salt-related data
-
     Returns structured inventory data or suggestions for retry if no match found.
     """
     args_schema: Type[BaseModel] = LocalInventoryToolInput
@@ -88,9 +86,9 @@ class LocalInventoryTool(BaseTool):
         suggestions = []
         query_terms = search_query.lower().split()
 
-        if any(term in ['fuel', 'gas', 'diesel'] for term in query_terms):
+        if any(term in ['fuel', 'gasoline', 'diesel'] for term in query_terms):
             suggestions.append(self.INVENTORY_PATHS['fuel'])
-        if any(term in ['salt', 'nacl', 'deice'] for term in query_terms):
+        if any(term in ['salt', 'rock_salt', 'treated_salt'] for term in query_terms):
             suggestions.append(self.INVENTORY_PATHS['salt'])
 
         return suggestions or list(self.INVENTORY_PATHS.values())
@@ -130,11 +128,9 @@ class LocalInventoryTool(BaseTool):
     def _run(self, search_query: str, json_path: str) -> str:
         """
         Execute inventory search with improved error handling and suggestions.
-
         Args:
             search_query: Search terms for filtering inventory data.
             json_path: Path to inventory data file.
-
         Returns:
             JSON string containing:
             - Matching inventory data (if found)

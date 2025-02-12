@@ -47,7 +47,6 @@ class ReportGeneratorTool(BaseTool):
     args_schema: Type[BaseModel] = ReportGeneratorInput
     description: str = """
     A tool that generates an interactive HTML report with the provided content and visualizations.
-
     Expected JSON structure:
     {
       "content": {
@@ -127,7 +126,6 @@ class ReportGeneratorTool(BaseTool):
         ]
       }
     }
-
     Features:
     - Interactive weather visualizations
     - Traffic and route mapping
@@ -146,7 +144,6 @@ class ReportGeneratorTool(BaseTool):
             return parts[1] if len(parts) > 1 else dt_str
         else:
             return dt_str
-
     def _format_weather_section(self, content: Dict[str, Any]) -> str:
         """Format weather dashboard section"""
         current = content.get('current_conditions', {})
@@ -287,7 +284,6 @@ class ReportGeneratorTool(BaseTool):
                         </div>
                     </div>
             '''
-
         return f"""
         <div class="section traffic-section">
             <h2>Route Optimization</h2>
@@ -304,9 +300,7 @@ class ReportGeneratorTool(BaseTool):
                     </div>
                 </div>
             </div>
-
             {traffic_map}
-
             <div class="route-details">
                 <h3>Optimized Route Details</h3>
                 <div class="metric-item">
@@ -317,7 +311,6 @@ class ReportGeneratorTool(BaseTool):
                     <span class="label">Estimated Time:</span>
                     <span class="value">{route_data.get('travel_time', 'N/A')}</span>
                 </div>
-
                 <h4>Route Segments</h4>
                 <div class="segments-container">
                     {segments_html}
@@ -388,7 +381,6 @@ class ReportGeneratorTool(BaseTool):
         <div class="section inventory-section">
             <h2>Resource Inventory</h2>
             {inventory_plot}
-
             <div class="inventory-details">
                 <h3>Current Inventory Levels</h3>
                 <div class="inventory-grid">
@@ -465,13 +457,11 @@ class ReportGeneratorTool(BaseTool):
                         --text-color: #343a40;
                         --border-color: #dee2e6;
                     }}
-
                     * {{
                         margin: 0;
                         padding: 0;
                         box-sizing: border-box;
                     }}
-
                     body {{
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
                         line-height: 1.6;
@@ -479,7 +469,6 @@ class ReportGeneratorTool(BaseTool):
                         color: var(--text-color);
                         padding: 2rem;
                     }}
-
                     .report-container {{
                         max-width: 1200px;
                         margin: 0 auto;
@@ -488,12 +477,10 @@ class ReportGeneratorTool(BaseTool):
                         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
                         overflow: hidden;
                     }}
-
                     h1, h2, h3, h4 {{
                         color: var(--primary-color);
                         margin-bottom: 1rem;
                     }}
-
                     h1 {{
                         background-color: var(--primary-color);
                         color: white;
@@ -501,93 +488,77 @@ class ReportGeneratorTool(BaseTool):
                         margin: 0;
                         text-align: center;
                     }}
-
                     .timestamp {{
                         text-align: right;
                         color: #6c757d;
                         padding: 1rem 2rem;
                         border-bottom: 1px solid var(--border-color);
                     }}
-
                     .section {{
                         padding: 2rem;
                         border-bottom: 1px solid var(--border-color);
                     }}
-
                     .conditions-grid, .inventory-grid, .forecast-grid {{
                         display: grid;
                         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
                         gap: 1.5rem;
                         margin: 1.5rem 0;
                     }}
-
                     .condition-item, .inventory-item, .forecast-item, .route-segment {{
                         background-color: var(--background-color);
                         padding: 1.5rem;
                         border-radius: 8px;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                     }}
-
                     .label {{
                         color: #6c757d;
                         font-weight: 500;
                     }}
-
                     .value {{
                         font-weight: 600;
                         color: var(--primary-color);
                     }}
-
                     .risk-high {{ color: var(--accent-color); }}
                     .risk-medium {{ color: #f39c12; }}
                     .risk-low {{ color: #27ae60; }}
-
                     .recommendations {{
                         background-color: #e8f4f8;
                         padding: 1.5rem;
                         border-radius: 8px;
                         margin-top: 1rem;
                     }}
-
                     .plotly-graph-div {{
                         margin: 2rem 0;
                         border-radius: 8px;
                         overflow: hidden;
                         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
                     }}
-
                     .segments-container {{
                         display: flex;
                         flex-direction: column;
                         gap: 1rem;
                         margin-top: 1rem;
                     }}
-
                     .route-segment {{
                         background-color: var(--background-color);
                         padding: 1rem;
                         border-radius: 8px;
                     }}
-
                     .segment-time {{
                         margin-bottom: 0.5rem;
                         font-weight: 500;
                     }}
-
                     .segment-points {{
                         color: #666;
                         font-size: 0.9em;
                     }}
-
                     @media (max-width: 768px) {{
                         body {{
                             padding: 1rem;
                         }}
-
                         .section {{
                             padding: 1.5rem;
                         }}
-
                         .conditions-grid, .inventory-grid, .forecast-grid {{
                             grid-template-columns: 1fr;
                         }}
