@@ -136,6 +136,17 @@ class ReportGeneratorTool(BaseTool):
     - Color-coded alerts and status indicators
     """
 
+    def _extract_time(self, dt_str: str) -> str:
+        """Helper to extract the time portion from a datetime string that may be in 'YYYY-MM-DDTHH:MM:SS' or 'YYYY-MM-DD HH:MM:SS' format."""
+        if 'T' in dt_str:
+            parts = dt_str.split('T')
+            return parts[1] if len(parts) > 1 else dt_str
+        elif ' ' in dt_str:
+            parts = dt_str.split()
+            return parts[1] if len(parts) > 1 else dt_str
+        else:
+            return dt_str
+
     def _format_weather_section(self, content: Dict[str, Any]) -> str:
         """Format weather dashboard section"""
         current = content.get('current_conditions', {})
@@ -159,7 +170,11 @@ class ReportGeneratorTool(BaseTool):
             snow_amounts = []
             for f in forecast:
                 times.append(f.get('time', ''))
-                snow_amounts.append(float(f.get('expected_snow', '0').split()[0]))
+                # Expected format: "X.XX mm" so we split and take the number part
+                try:
+                    snow_amounts.append(float(f.get('expected_snow', '0').split()[0]))
+                except (ValueError, IndexError):
+                    snow_amounts.append(0)
 
             fig.add_trace(go.Bar(
                 x=times,
@@ -253,6 +268,26 @@ class ReportGeneratorTool(BaseTool):
         else:
             traffic_map = ""
 
+        # Process route segments and safely extract time portions
+        segments_html = ""
+        for segment in route_data.get('segments', []):
+            start_str = segment.get('start', '')
+            end_str = segment.get('end', '')
+            start_time = self._extract_time(start_str)
+            end_time = self._extract_time(end_str)
+            segments_html += f'''
+                    <div class="route-segment">
+                        <div class="segment-time">
+                            <span class="label">Time:</span>
+                            <span class="value">{start_time} - {end_time}</span>
+                        </div>
+                        <div class="segment-points">
+                            <div>From: ({segment.get('start_point', {}).get('latitude', 'N/A')}, {segment.get('start_point', {}).get('longitude', 'N/A')})</div>
+                            <div>To: ({segment.get('end_point', {}).get('latitude', 'N/A')}, {segment.get('end_point', {}).get('longitude', 'N/A')})</div>
+                        </div>
+                    </div>
+            '''
+
         return f"""
         <div class="section traffic-section">
             <h2>Route Optimization</h2>
@@ -285,18 +320,7 @@ class ReportGeneratorTool(BaseTool):
 
                 <h4>Route Segments</h4>
                 <div class="segments-container">
-                    {''.join([f'''
-                    <div class="route-segment">
-                        <div class="segment-time">
-                            <span class="label">Time:</span>
-                            <span class="value">{segment.get('start', '').split('T')[1]} - {segment.get('end', '').split('T')[1]}</span>
-                        </div>
-                        <div class="segment-points">
-                            <div>From: ({segment.get('start_point', {}).get('latitude', 'N/A')}, {segment.get('start_point', {}).get('longitude', 'N/A')})</div>
-                            <div>To: ({segment.get('end_point', {}).get('latitude', 'N/A')}, {segment.get('end_point', {}).get('longitude', 'N/A')})</div>
-                        </div>
-                    </div>
-                    ''' for segment in route_data.get('segments', [])])}
+                    {segments_html}
                 </div>
             </div>
         </div>
@@ -319,8 +343,12 @@ class ReportGeneratorTool(BaseTool):
 
         for resource, alert_info in alerts.items():
             resources.append(resource)
-            current_level = float(alert_info['Current Level'].split()[0])
-            threshold = float(alert_info['Threshold'].split()[0])
+            try:
+                current_level = float(alert_info['Current Level'].split()[0])
+                threshold = float(alert_info['Threshold'].split()[0])
+            except (ValueError, KeyError, IndexError):
+                current_level = 0
+                threshold = 0
             current_levels.append(current_level)
             thresholds.append(threshold)
 
@@ -383,7 +411,6 @@ class ReportGeneratorTool(BaseTool):
         try:
             # Parse the input JSON string
             try:
-                # Expect tool_input to be a valid JSON string (as provided by the Pydantic model)
                 data = json.loads(tool_input)
             except json.JSONDecodeError as e:
                 return f"Error parsing JSON input: {str(e)}\nInput received: {tool_input}"
@@ -392,7 +419,7 @@ class ReportGeneratorTool(BaseTool):
             if not content:
                 return "Error: No content found in the input data"
 
-            # Get the project root directory
+            # Get the project root directory (assumes a specific directory structure)
             project_root = Path(__file__).parent.parent.parent.parent
             reports_dir = project_root / 'reports'
             os.makedirs(reports_dir, exist_ok=True)

@@ -2,7 +2,6 @@ from crewai.tools import BaseTool
 from typing import Type, Optional, Dict, Any, List, ClassVar
 from pydantic import BaseModel, Field
 import json
-import os
 from pathlib import Path
 from datetime import datetime
 
@@ -78,7 +77,7 @@ class LocalInventoryTool(BaseTool):
             }
         }
 
-        # Create individual inventory files
+        # Create individual inventory files if they do not exist
         for resource, data in default_data.items():
             file_path = base_path / f'{resource}_inv.json'
             if not file_path.exists():
@@ -107,21 +106,21 @@ class LocalInventoryTool(BaseTool):
             return {"error": f"Error reading inventory file: {str(e)}"}
 
     def _search_inventory(self, query: str, data: Dict[str, Any]) -> Dict[str, Any]:
-        """Search inventory data based on query terms."""
+        """Search inventory data based on query terms with relaxed matching."""
         query_terms = query.lower().split()
 
-        # Helper function to check if all query terms are in text
+        # Relaxed helper function: returns True if any query term is present in text
         def matches_query(text: str) -> bool:
             text = text.lower()
-            return all(term in text for term in query_terms)
+            return any(term in text for term in query_terms)
 
-        # Try to match specific sections first
+        # Try to match specific 'inventory' section first
         if 'inventory' in data:
             text_to_search = json.dumps(data['inventory']).lower()
             if matches_query(text_to_search):
                 return {'inventory': data['inventory']}
 
-        # If no specific matches, search entire content
+        # If no specific match found, search the entire content
         text_to_search = json.dumps(data).lower()
         if matches_query(text_to_search):
             return data
@@ -133,15 +132,15 @@ class LocalInventoryTool(BaseTool):
         Execute inventory search with improved error handling and suggestions.
 
         Args:
-            search_query: Search terms for filtering inventory data
-            json_path: Path to inventory data file
+            search_query: Search terms for filtering inventory data.
+            json_path: Path to inventory data file.
 
         Returns:
             JSON string containing:
-            - Matching inventory data
+            - Matching inventory data (if found)
             - Search metadata
             - Suggested alternatives if no matches
-            - Error details if applicable
+            - Error details if applicable.
         """
         try:
             # Initialize inventory files if needed
@@ -171,7 +170,7 @@ class LocalInventoryTool(BaseTool):
                     "suggested_paths": suggested_paths
                 }, indent=2)
 
-            # Search the data
+            # Search the data using the relaxed matching function
             results = self._search_inventory(search_query, data)
 
             if results:
