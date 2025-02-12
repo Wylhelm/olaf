@@ -1,44 +1,45 @@
 from crewai.tools import BaseTool
-from typing import Type, Optional, Dict, Any
+from typing import Type, Dict, Any
 from pydantic import BaseModel, Field
 from pathlib import Path
 import os
 from datetime import datetime
 import json
 import plotly.graph_objects as go
-import plotly.express as px
 import plotly.io as pio
 
 
 class ReportGeneratorInput(BaseModel):
     tool_input: str = Field(
         description="A JSON string containing report data with weather, traffic, inventory, and recommendations sections",
-        examples=['''{
-            "content": {
-                "title": "Snow Removal Operations Report",
-                "sections": [
-                    {
-                        "header": "Weather Dashboard",
-                        "content": {
-                            "current_conditions": {
-                                "temperature": -1.28,
-                                "conditions": "Snowy",
-                                "wind_speed": 4.12,
-                                "road_surface_temp": -4.28
-                            },
-                            "forecast": [
-                                {
-                                    "time": "2025-02-04 00:00",
-                                    "expected_snow": "3.13 mm",
-                                    "snow_risk": "High",
-                                    "road_condition": "Snowy"
-                                }
-                            ]
-                        }
-                    }
-                ]
+        examples=[
+            r'''{
+  "content": {
+    "title": "Snow Removal Operations Report",
+    "sections": [
+      {
+        "header": "Weather Dashboard",
+        "content": {
+          "current_conditions": {
+            "temperature": -1.28,
+            "conditions": "Snowy",
+            "wind_speed": 4.12,
+            "road_surface_temp": -4.28
+          },
+          "forecast": [
+            {
+              "time": "2025-02-04 00:00",
+              "expected_snow": "3.13 mm",
+              "snow_risk": "High",
+              "road_condition": "Snowy"
             }
-        }''']
+          ]
+        }
+      }
+    ]
+  }
+}'''
+        ]
     )
 
 
@@ -47,6 +48,7 @@ class ReportGeneratorTool(BaseTool):
     args_schema: Type[BaseModel] = ReportGeneratorInput
     description: str = """
     A tool that generates an interactive HTML report with the provided content and visualizations.
+
     Expected JSON structure:
     {
       "content": {
@@ -135,24 +137,20 @@ class ReportGeneratorTool(BaseTool):
     """
 
     def _extract_time(self, dt_str: str) -> str:
-        """Helper to extract the time portion from a datetime string that may be in 'YYYY-MM-DDTHH:MM:SS' or 'YYYY-MM-DD HH:MM:SS' format."""
+        """Extracts the time portion from a datetime string."""
         if 'T' in dt_str:
-            parts = dt_str.split('T')
-            return parts[1] if len(parts) > 1 else dt_str
+            return dt_str.split('T')[1] if len(dt_str.split('T')) > 1 else dt_str
         elif ' ' in dt_str:
-            parts = dt_str.split()
-            return parts[1] if len(parts) > 1 else dt_str
-        else:
-            return dt_str
+            return dt_str.split()[1] if len(dt_str.split()) > 1 else dt_str
+        return dt_str
+
     def _format_weather_section(self, content: Dict[str, Any]) -> str:
-        """Format weather dashboard section"""
+        """Format the Weather Dashboard section."""
         current = content.get('current_conditions', {})
         forecast = content.get('forecast', [])
 
-        # Create weather visualization
+        # Create weather visualization using Plotly
         fig = go.Figure()
-
-        # Add current conditions
         fig.add_trace(go.Indicator(
             mode="number+delta",
             value=current.get('temperature', 0),
@@ -160,33 +158,27 @@ class ReportGeneratorTool(BaseTool):
             delta={'reference': current.get('road_surface_temp', 0)},
             domain={'row': 0, 'column': 0}
         ))
-
-        # Add forecast data if available
         if forecast:
             times = []
             snow_amounts = []
             for f in forecast:
                 times.append(f.get('time', ''))
-                # Expected format: "X.XX mm" so we split and take the number part
                 try:
                     snow_amounts.append(float(f.get('expected_snow', '0').split()[0]))
                 except (ValueError, IndexError):
                     snow_amounts.append(0)
-
             fig.add_trace(go.Bar(
                 x=times,
                 y=snow_amounts,
                 name='Expected Snow (mm)',
                 marker_color='#3498db'
             ))
-
         fig.update_layout(
             title='Weather Forecast',
             height=400,
             grid={'rows': 2, 'columns': 1},
             margin=dict(t=50, b=50, l=50, r=50)
         )
-
         weather_plot = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
 
         return f"""
@@ -214,34 +206,33 @@ class ReportGeneratorTool(BaseTool):
             <div class="forecast-details">
                 <h3>Detailed Forecast</h3>
                 <div class="forecast-grid">
-                    {''.join([f'''
+                    {''.join([
+            f'''
                     <div class="forecast-item">
                         <div class="time">{f.get('time', '')}</div>
                         <div class="snow">Expected Snow: {f.get('expected_snow', 'N/A')}</div>
                         <div class="risk">Risk Level: <span class="risk-{f.get('snow_risk', '').lower()}">{f.get('snow_risk', 'N/A')}</span></div>
                         <div class="road">Road Condition: {f.get('road_condition', 'N/A')}</div>
                     </div>
-                    ''' for f in forecast])}
+                        ''' for f in forecast
+        ])}
                 </div>
             </div>
         </div>
         """
 
     def _format_traffic_section(self, content: Dict[str, Any]) -> str:
-        """Format traffic and route optimization section"""
+        """Format the Route Optimization section."""
         traffic_data = content.get('traffic_data', {})
         route_data = content.get('optimized_route', {})
 
-        # Create traffic incidents visualization
+        # Create traffic incidents map
         incidents = traffic_data.get('traffic_incidents', [])
         if incidents:
             fig = go.Figure()
-
-            # Add incidents as scatter points on a map
             lats = [inc['location']['latitude'] for inc in incidents]
             lons = [inc['location']['longitude'] for inc in incidents]
             texts = [f"{inc['type']}: {inc['description']}" for inc in incidents]
-
             fig.add_trace(go.Scattermapbox(
                 lat=lats,
                 lon=lons,
@@ -250,7 +241,6 @@ class ReportGeneratorTool(BaseTool):
                 text=texts,
                 textposition="top center"
             ))
-
             fig.update_layout(
                 mapbox_style="carto-positron",
                 mapbox=dict(
@@ -260,18 +250,14 @@ class ReportGeneratorTool(BaseTool):
                 height=400,
                 margin=dict(t=0, b=0, l=0, r=0)
             )
-
             traffic_map = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         else:
             traffic_map = ""
 
-        # Process route segments and safely extract time portions
         segments_html = ""
         for segment in route_data.get('segments', []):
-            start_str = segment.get('start', '')
-            end_str = segment.get('end', '')
-            start_time = self._extract_time(start_str)
-            end_time = self._extract_time(end_str)
+            start_time = self._extract_time(segment.get('start', ''))
+            end_time = self._extract_time(segment.get('end', ''))
             segments_html += f'''
                     <div class="route-segment">
                         <div class="segment-time">
@@ -284,6 +270,7 @@ class ReportGeneratorTool(BaseTool):
                         </div>
                     </div>
             '''
+
         return f"""
         <div class="section traffic-section">
             <h2>Route Optimization</h2>
@@ -320,20 +307,16 @@ class ReportGeneratorTool(BaseTool):
         """
 
     def _format_inventory_section(self, content: Dict[str, Any]) -> str:
-        """Format resource inventory section"""
+        """Format the Resource Inventory section."""
         inventory = content.get('inventory_levels', {})
         usage = content.get('recent_usage', {})
         needs = content.get('projected_needs', {})
         alerts = content.get('low_inventory_alerts', {})
 
-        # Create inventory visualization
         fig = go.Figure()
-
-        # Add current levels vs thresholds
         resources = []
         current_levels = []
         thresholds = []
-
         for resource, alert_info in alerts.items():
             resources.append(resource)
             try:
@@ -352,30 +335,21 @@ class ReportGeneratorTool(BaseTool):
                 y=current_levels,
                 marker_color='#3498db'
             ))
-
             fig.add_trace(go.Bar(
                 name='Threshold',
                 x=resources,
                 y=thresholds,
                 marker_color='#e74c3c'
             ))
-
             fig.update_layout(
                 title='Resource Inventory Levels vs Thresholds',
                 barmode='group',
                 height=400,
                 margin=dict(t=50, b=50, l=50, r=50)
             )
-
             inventory_plot = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
         else:
             inventory_plot = ""
-
-        print("[DEBUG] inventory_levels content:", json.dumps(inventory, indent=2))
-        if not inventory:
-            print("[ERROR] Inventory data is missing!")
-        else:
-            print(f"[DEBUG] Inventory Items Found: {list(inventory.keys())}")
 
         return f"""
         <div class="section inventory-section">
@@ -384,7 +358,8 @@ class ReportGeneratorTool(BaseTool):
             <div class="inventory-details">
                 <h3>Current Inventory Levels</h3>
                 <div class="inventory-grid">
-                    {''.join([f'''
+                    {''.join([
+            f'''
                     <div class="inventory-item">
                         <div class="resource-name">{resource}</div>
                         <div class="current-level">Current: {level}</div>
@@ -392,16 +367,16 @@ class ReportGeneratorTool(BaseTool):
                         <div class="projected">Projected Need: {needs.get(resource, 'N/A')}</div>
                         <div class="alert-status">Status: {alerts.get(resource, {}).get('Alert', 'N/A')}</div>
                     </div>
-                    ''' for resource, level in inventory.items()])}
+                        ''' for resource, level in inventory.items()
+        ])}
                 </div>
             </div>
         </div>
         """
 
     def _run(self, tool_input: str) -> str:
-        """Generate an interactive HTML report with the provided content and visualizations"""
+        """Generate an interactive HTML report with the provided content."""
         try:
-            # Parse the input JSON string
             try:
                 data = json.loads(tool_input)
             except json.JSONDecodeError as e:
@@ -411,36 +386,34 @@ class ReportGeneratorTool(BaseTool):
             if not content:
                 return "Error: No content found in the input data"
 
-            # Get the project root directory (assumes a specific directory structure)
             project_root = Path(__file__).parent.parent.parent.parent
             reports_dir = project_root / 'reports'
             os.makedirs(reports_dir, exist_ok=True)
 
-            # Generate report filename
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f'snow_removal_report_{timestamp}.html'
             report_path = reports_dir / filename
 
-            # Process sections
             sections_html = ""
             for section in content.get('sections', []):
-                if section['header'] == 'Weather Dashboard':
-                    sections_html += self._format_weather_section(section['content'])
-                elif section['header'] == 'Route Optimization':
-                    sections_html += self._format_traffic_section(section['content'])
-                elif section['header'] == 'Resource Inventory':
-                    sections_html += self._format_inventory_section(section['content'])
-                elif section['header'] == 'Operational Recommendations':
+                header = section.get('header', '')
+                sec_content = section.get('content', {})
+                if header == 'Weather Dashboard':
+                    sections_html += self._format_weather_section(sec_content)
+                elif header == 'Route Optimization':
+                    sections_html += self._format_traffic_section(sec_content)
+                elif header == 'Resource Inventory':
+                    sections_html += self._format_inventory_section(sec_content)
+                elif header == 'Operational Recommendations':
                     sections_html += f"""
                     <div class="section recommendations-section">
                         <h2>Operational Recommendations</h2>
                         <div class="recommendations">
-                            <p>{section['content'].get('priority_based_schedules', '')}</p>
-                            <p>{section['content'].get('completion_estimates', '')}</p>
+                            <p>{sec_content.get('priority_based_schedules', '')}</p>
+                            <p>{sec_content.get('completion_estimates', '')}</p>
                         </div>
                     </div>
                     """
-
             html_content = f"""
             <!DOCTYPE html>
             <html lang="en">
@@ -574,8 +547,7 @@ class ReportGeneratorTool(BaseTool):
             </body>
             </html>
             """
-
-            print("[DEBUG] Final HTML Content:\n", html_content[:500])  # Print only the first 500 characters to check
+            print("[DEBUG] Final HTML Content (first 500 chars):", html_content[:500])
             try:
                 with open(report_path, 'w', encoding='utf-8') as f:
                     f.write(html_content)
@@ -583,9 +555,7 @@ class ReportGeneratorTool(BaseTool):
             except Exception as e:
                 print(f"[ERROR] Writing report failed: {e}")
                 return f"Error writing report: {str(e)}"
-
             return f"HTML report generated successfully: {report_path}"
-
         except Exception as e:
             print(f"[ERROR] Unexpected error: {e}")
             return f"Error generating report: {str(e)}\nInput received: {tool_input}"
