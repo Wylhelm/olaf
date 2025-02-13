@@ -80,7 +80,7 @@ weather_data_collection:
     - Validate forecast data against historical trends and local sensors.
     This data will be used to support route planning and resource allocation.
   expected_output: |
-    A detailed weather analysis report for {Quebec} including:
+    A detailed weather analysis report for Quebec including:
     - Current weather conditions and validated alerts.
     - Detailed snowfall and accumulation predictions.
     - Road surface condition mapping.
@@ -173,19 +173,57 @@ route_optimization:
 stakeholder_communication:
   description: |
     Generate comprehensive reports and alerts using the enhanced ReportGeneratorTool:
-    - Create interactive HTML reports with clear visualizations.
-    - Include weather condition maps, traffic overlays, and inventory dashboards.
-    - Provide detailed operational recommendations with data-driven justifications.
-    - Include priority-based schedules, completion estimates, and contingency plans.
-    - Establish real-time alerts for critical updates via multiple communication channels (e.g., email, SMS, internal dashboards).
-    - Incorporate a feedback mechanism to capture stakeholder responses and adjust operations accordingly.
+
+    1. Collect and Structure Data:
+       Gather data from various sources and structure it according to the ReportGeneratorTool schema.
+       The data structure should include:
+
+       - weather_data:
+         * current_temp (float): Current temperature
+         * current_conditions (str): Current weather description
+         * accumulation (float): Snow accumulation in cm
+         * forecast (array): List of forecast entries with time, snowfall, and temp
+         * alerts (array): List of weather alerts with level and message
+
+       - resource_data:
+         * salt_level (float): Salt inventory percentage
+         * fuel_level (float): Fuel reserves percentage
+         * depots (array): List of depot statuses with name, status, and color
+
+       - route_data:
+         * active_routes (int): Number of active routes
+         * coverage (float): Coverage percentage
+         * efficiency_scores (object): Route efficiency scores
+         * priority_zones (object): Priority zone statuses
+
+       - fleet_data:
+         * vehicles (array): List of vehicle statuses with id, status, color, region, priority
+
+       - alerts_data (array):
+         * List of system alerts with level and message
+
+    2. Generate Report:
+       - Convert the structured data to a JSON string using json.dumps()
+       - Pass the JSON string directly to ReportGeneratorTool._run()
+       - Create interactive HTML reports with clear visualizations
+       - Include weather condition maps, traffic overlays, and inventory dashboards
+       - Provide detailed operational recommendations with data-driven justifications
+       - Include priority-based schedules, completion estimates, and contingency plans
+
+    3. Establish Communication Channels:
+       - Set up real-time alerts for critical updates via multiple channels (e.g., email, SMS, internal dashboards)
+       - Incorporate a feedback mechanism to capture stakeholder responses and adjust operations accordingly
+
   expected_output: |
     An interactive, mobile-responsive HTML report that includes:
-    - A visual weather dashboard with current conditions, forecasts, and alert levels.
-    - Interactive maps showing optimized routes, traffic incidents, and suggested detours.
-    - Inventory visualizations with current levels, usage rates, and alerts.
-    - An operational timeline with team assignments, milestones, and contingency procedures.
-    - Automated alerts and a real-time communication feed for stakeholders.
+    - A visual weather dashboard with current conditions, forecasts, and alert levels
+    - Interactive maps showing optimized routes, traffic incidents, and suggested detours
+    - Inventory visualizations with current levels, usage rates, and alerts
+    - An operational timeline with team assignments, milestones, and contingency procedures
+    - Automated alerts and a real-time communication feed for stakeholders
+
+    The report must be generated using correctly structured data following the ReportGeneratorTool schema, with proper JSON string conversion using json.dumps().
+
   agent: notifications_alerts_manager
   context:
     - global_planning

@@ -1,561 +1,278 @@
-from crewai.tools import BaseTool
-from typing import Type, Dict, Any
-from pydantic import BaseModel, Field
-from pathlib import Path
-import os
 from datetime import datetime
+import os
+from typing import Dict, List, Any
 import json
-import plotly.graph_objects as go
-import plotly.io as pio
-
-
-class ReportGeneratorInput(BaseModel):
-    tool_input: str = Field(
-        description="A JSON string containing report data with weather, traffic, inventory, and recommendations sections",
-        examples=[
-            r'''{
-  "content": {
-    "title": "Snow Removal Operations Report",
-    "sections": [
-      {
-        "header": "Weather Dashboard",
-        "content": {
-          "current_conditions": {
-            "temperature": -1.28,
-            "conditions": "Snowy",
-            "wind_speed": 4.12,
-            "road_surface_temp": -4.28
-          },
-          "forecast": [
-            {
-              "time": "2025-02-04 00:00",
-              "expected_snow": "3.13 mm",
-              "snow_risk": "High",
-              "road_condition": "Snowy"
-            }
-          ]
-        }
-      }
-    ]
-  }
-}'''
-        ]
-    )
-
+from crewai.tools import BaseTool
 
 class ReportGeneratorTool(BaseTool):
-    name: str = "Generate HTML Report"
-    args_schema: Type[BaseModel] = ReportGeneratorInput
-    description: str = """
-    A tool that generates an interactive HTML report with the provided content and visualizations.
-
-    Expected JSON structure:
+    """Tool for generating interactive HTML dashboard reports for snow removal operations."""
+    
+    name: str = "Report Generator"
+    description: str = """Generates interactive HTML dashboard reports for snow removal operations.
+    
+    Input should be a JSON string containing:
     {
-      "content": {
-        "title": "Report Title",
-        "sections": [
-          {
-            "header": "Weather Dashboard",
-            "content": {
-              "current_conditions": {
-                "temperature": number,
-                "conditions": string,
-                "wind_speed": number,
-                "road_surface_temp": number
-              },
-              "forecast": [
-                {
-                  "time": "YYYY-MM-DD HH:mm",
-                  "expected_snow": "X.XX mm",
-                  "snow_risk": "High|Medium|Low",
-                  "road_condition": string
-                }
-              ]
-            }
-          },
-          {
-            "header": "Route Optimization",
-            "content": {
-              "traffic_data": {
-                "current_conditions": string,
-                "traffic_speed": string,
-                "traffic_incidents": [
-                  {
-                    "type": string,
-                    "description": string,
-                    "location": {"latitude": number, "longitude": number},
-                    "start_time": "ISO datetime",
-                    "end_time": "ISO datetime"
-                  }
-                ]
-              },
-              "optimized_route": {
-                "length": string,
-                "travel_time": string,
-                "segments": [
-                  {
-                    "start": "ISO datetime",
-                    "end": "ISO datetime",
-                    "start_point": {"latitude": number, "longitude": number},
-                    "end_point": {"latitude": number, "longitude": number}
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "header": "Resource Inventory",
-            "content": {
-              "inventory_levels": {"resource": "amount"},
-              "recent_usage": {"resource": "usage rate"},
-              "projected_needs": {"resource": "projected amount"},
-              "low_inventory_alerts": {
-                "resource": {
-                  "Threshold": "amount",
-                  "Current Level": "amount",
-                  "Alert": string
-                }
-              }
-            }
-          },
-          {
-            "header": "Operational Recommendations",
-            "content": {
-              "priority_based_schedules": string,
-              "completion_estimates": string
-            }
-          }
-        ]
-      }
-    }
-    Features:
-    - Interactive weather visualizations
-    - Traffic and route mapping
-    - Resource inventory tracking
-    - Mobile-responsive design
-    - Color-coded alerts and status indicators
-    """
+        "weather_data": {
+            "current_temp": float,
+            "current_conditions": str,
+            "accumulation": float,
+            "forecast": [{"time": str, "snowfall": float, "temp": float}, ...],
+            "alerts": [...]
+        },
+        "resource_data": {
+            "salt_level": float,
+            "fuel_level": float,
+            "depots": [{"name": str, "status": str, "status_color": str}, ...]
+        },
+        "route_data": {
+            "active_routes": int,
+            "coverage": float,
+            "efficiency_scores": {"route_name": float, ...},
+            "priority_zones": {"zone_name": [float, str], ...}
+        },
+        "fleet_data": {
+            "vehicles": [{"id": str, "status": str, "status_color": str, "region": str, "priority": str}, ...]
+        },
+        "alerts_data": [{"level": str, "message": str}, ...]
+    }"""
 
-    def _extract_time(self, dt_str: str) -> str:
-        """Extracts the time portion from a datetime string."""
-        if 'T' in dt_str:
-            return dt_str.split('T')[1] if len(dt_str.split('T')) > 1 else dt_str
-        elif ' ' in dt_str:
-            return dt_str.split()[1] if len(dt_str.split()) > 1 else dt_str
-        return dt_str
+    template_path: str = ""
 
-    def _format_weather_section(self, content: Dict[str, Any]) -> str:
-        """Format the Weather Dashboard section."""
-        current = content.get('current_conditions', {})
-        forecast = content.get('forecast', [])
-
-        # Create weather visualization using Plotly
-        fig = go.Figure()
-        fig.add_trace(go.Indicator(
-            mode="number+delta",
-            value=current.get('temperature', 0),
-            title={'text': "Temperature (°C)"},
-            delta={'reference': current.get('road_surface_temp', 0)},
-            domain={'row': 0, 'column': 0}
-        ))
-        if forecast:
-            times = []
-            snow_amounts = []
-            for f in forecast:
-                times.append(f.get('time', ''))
-                try:
-                    snow_amounts.append(float(f.get('expected_snow', '0').split()[0]))
-                except (ValueError, IndexError):
-                    snow_amounts.append(0)
-            fig.add_trace(go.Bar(
-                x=times,
-                y=snow_amounts,
-                name='Expected Snow (mm)',
-                marker_color='#3498db'
-            ))
-        fig.update_layout(
-            title='Weather Forecast',
-            height=400,
-            grid={'rows': 2, 'columns': 1},
-            margin=dict(t=50, b=50, l=50, r=50)
+    def __init__(self):
+        super().__init__()
+        self.template_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+            'reports',
+            'snow_removal_dashboard_template.html'
         )
-        weather_plot = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-
-        return f"""
-        <div class="section weather-section">
-            <h2>Weather Dashboard</h2>
-            <div class="conditions-grid">
-                <div class="condition-item">
-                    <span class="label">Temperature:</span>
-                    <span class="value">{current.get('temperature', 'N/A')}°C</span>
-                </div>
-                <div class="condition-item">
-                    <span class="label">Conditions:</span>
-                    <span class="value">{current.get('conditions', 'N/A')}</span>
-                </div>
-                <div class="condition-item">
-                    <span class="label">Wind Speed:</span>
-                    <span class="value">{current.get('wind_speed', 'N/A')} m/s</span>
-                </div>
-                <div class="condition-item">
-                    <span class="label">Road Surface Temp:</span>
-                    <span class="value">{current.get('road_surface_temp', 'N/A')}°C</span>
-                </div>
-            </div>
-            {weather_plot}
-            <div class="forecast-details">
-                <h3>Detailed Forecast</h3>
-                <div class="forecast-grid">
-                    {''.join([
-            f'''
-                    <div class="forecast-item">
-                        <div class="time">{f.get('time', '')}</div>
-                        <div class="snow">Expected Snow: {f.get('expected_snow', 'N/A')}</div>
-                        <div class="risk">Risk Level: <span class="risk-{f.get('snow_risk', '').lower()}">{f.get('snow_risk', 'N/A')}</span></div>
-                        <div class="road">Road Condition: {f.get('road_condition', 'N/A')}</div>
-                    </div>
-                        ''' for f in forecast
-        ])}
-                </div>
-            </div>
-        </div>
+        
+    def _run(self, input_str: str = "") -> str:
         """
-
-    def _format_traffic_section(self, content: Dict[str, Any]) -> str:
-        """Format the Route Optimization section."""
-        traffic_data = content.get('traffic_data', {})
-        route_data = content.get('optimized_route', {})
-
-        # Create traffic incidents map
-        incidents = traffic_data.get('traffic_incidents', [])
-        if incidents:
-            fig = go.Figure()
-            lats = [inc['location']['latitude'] for inc in incidents]
-            lons = [inc['location']['longitude'] for inc in incidents]
-            texts = [f"{inc['type']}: {inc['description']}" for inc in incidents]
-            fig.add_trace(go.Scattermapbox(
-                lat=lats,
-                lon=lons,
-                mode='markers+text',
-                marker=dict(size=12, color='red'),
-                text=texts,
-                textposition="top center"
-            ))
-            fig.update_layout(
-                mapbox_style="carto-positron",
-                mapbox=dict(
-                    center=dict(lat=sum(lats) / len(lats), lon=sum(lons) / len(lons)),
-                    zoom=12
-                ),
-                height=400,
-                margin=dict(t=0, b=0, l=0, r=0)
-            )
-            traffic_map = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-        else:
-            traffic_map = ""
-
-        segments_html = ""
-        for segment in route_data.get('segments', []):
-            start_time = self._extract_time(segment.get('start', ''))
-            end_time = self._extract_time(segment.get('end', ''))
-            segments_html += f'''
-                    <div class="route-segment">
-                        <div class="segment-time">
-                            <span class="label">Time:</span>
-                            <span class="value">{start_time} - {end_time}</span>
-                        </div>
-                        <div class="segment-points">
-                            <div>From: ({segment.get('start_point', {}).get('latitude', 'N/A')}, {segment.get('start_point', {}).get('longitude', 'N/A')})</div>
-                            <div>To: ({segment.get('end_point', {}).get('latitude', 'N/A')}, {segment.get('end_point', {}).get('longitude', 'N/A')})</div>
-                        </div>
-                    </div>
-            '''
-
-        return f"""
-        <div class="section traffic-section">
-            <h2>Route Optimization</h2>
-            <div class="traffic-conditions">
-                <h3>Current Traffic Conditions</h3>
-                <div class="conditions-grid">
-                    <div class="condition-item">
-                        <span class="label">Status:</span>
-                        <span class="value">{traffic_data.get('current_conditions', 'N/A')}</span>
-                    </div>
-                    <div class="condition-item">
-                        <span class="label">Speed:</span>
-                        <span class="value">{traffic_data.get('traffic_speed', 'N/A')}</span>
-                    </div>
-                </div>
-            </div>
-            {traffic_map}
-            <div class="route-details">
-                <h3>Optimized Route Details</h3>
-                <div class="metric-item">
-                    <span class="label">Total Distance:</span>
-                    <span class="value">{route_data.get('length', 'N/A')}</span>
-                </div>
-                <div class="metric-item">
-                    <span class="label">Estimated Time:</span>
-                    <span class="value">{route_data.get('travel_time', 'N/A')}</span>
-                </div>
-                <h4>Route Segments</h4>
-                <div class="segments-container">
-                    {segments_html}
-                </div>
-            </div>
-        </div>
+        Generate an interactive HTML dashboard report using the provided data.
+        
+        Args:
+            input_str: JSON string containing:
+                {
+                    "weather_data": {...},
+                    "resource_data": {...},
+                    "route_data": {...},
+                    "fleet_data": {...},
+                    "alerts_data": [...]
+                }
+                
+        Returns:
+            str: Path to the generated report file
         """
-
-    def _format_inventory_section(self, content: Dict[str, Any]) -> str:
-        """Format the Resource Inventory section."""
-        inventory = content.get('inventory_levels', {})
-        usage = content.get('recent_usage', {})
-        needs = content.get('projected_needs', {})
-        alerts = content.get('low_inventory_alerts', {})
-
-        fig = go.Figure()
-        resources = []
-        current_levels = []
-        thresholds = []
-        for resource, alert_info in alerts.items():
-            resources.append(resource)
-            try:
-                current_level = float(alert_info['Current Level'].split()[0])
-                threshold = float(alert_info['Threshold'].split()[0])
-            except (ValueError, KeyError, IndexError):
-                current_level = 0
-                threshold = 0
-            current_levels.append(current_level)
-            thresholds.append(threshold)
-
-        if resources:
-            fig.add_trace(go.Bar(
-                name='Current Level',
-                x=resources,
-                y=current_levels,
-                marker_color='#3498db'
-            ))
-            fig.add_trace(go.Bar(
-                name='Threshold',
-                x=resources,
-                y=thresholds,
-                marker_color='#e74c3c'
-            ))
-            fig.update_layout(
-                title='Resource Inventory Levels vs Thresholds',
-                barmode='group',
-                height=400,
-                margin=dict(t=50, b=50, l=50, r=50)
-            )
-            inventory_plot = pio.to_html(fig, full_html=False, include_plotlyjs='cdn')
-        else:
-            inventory_plot = ""
-
-        return f"""
-        <div class="section inventory-section">
-            <h2>Resource Inventory</h2>
-            {inventory_plot}
-            <div class="inventory-details">
-                <h3>Current Inventory Levels</h3>
-                <div class="inventory-grid">
-                    {''.join([
-            f'''
-                    <div class="inventory-item">
-                        <div class="resource-name">{resource}</div>
-                        <div class="current-level">Current: {level}</div>
-                        <div class="usage-rate">Usage: {usage.get(resource, 'N/A')}</div>
-                        <div class="projected">Projected Need: {needs.get(resource, 'N/A')}</div>
-                        <div class="alert-status">Status: {alerts.get(resource, {}).get('Alert', 'N/A')}</div>
-                    </div>
-                        ''' for resource, level in inventory.items()
-        ])}
-                </div>
-            </div>
-        </div>
-        """
-
-    def _run(self, tool_input: str) -> str:
-        """Generate an interactive HTML report with the provided content."""
+        if not input_str:
+            raise ValueError("Input string cannot be empty. Must provide JSON data following the schema.")
+            
         try:
-            try:
-                data = json.loads(tool_input)
-            except json.JSONDecodeError as e:
-                return f"Error parsing JSON input: {str(e)}\nInput received: {tool_input}"
-
-            content = data.get('content', {})
-            if not content:
-                return "Error: No content found in the input data"
-
-            project_root = Path(__file__).parent.parent.parent.parent
-            reports_dir = project_root / 'reports'
-            os.makedirs(reports_dir, exist_ok=True)
-
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f'snow_removal_report_{timestamp}.html'
-            report_path = reports_dir / filename
-
-            sections_html = ""
-            for section in content.get('sections', []):
-                header = section.get('header', '')
-                sec_content = section.get('content', {})
-                if header == 'Weather Dashboard':
-                    sections_html += self._format_weather_section(sec_content)
-                elif header == 'Route Optimization':
-                    sections_html += self._format_traffic_section(sec_content)
-                elif header == 'Resource Inventory':
-                    sections_html += self._format_inventory_section(sec_content)
-                elif header == 'Operational Recommendations':
-                    sections_html += f"""
-                    <div class="section recommendations-section">
-                        <h2>Operational Recommendations</h2>
-                        <div class="recommendations">
-                            <p>{sec_content.get('priority_based_schedules', '')}</p>
-                            <p>{sec_content.get('completion_estimates', '')}</p>
-                        </div>
-                    </div>
-                    """
-            html_content = f"""
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>{content.get('title', 'Snow Removal Report')}</title>
-                <style>
-                    :root {{
-                        --primary-color: #2c3e50;
-                        --secondary-color: #3498db;
-                        --accent-color: #e74c3c;
-                        --background-color: #f8f9fa;
-                        --text-color: #343a40;
-                        --border-color: #dee2e6;
-                    }}
-                    * {{
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }}
-                    body {{
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        line-height: 1.6;
-                        background-color: var(--background-color);
-                        color: var(--text-color);
-                        padding: 2rem;
-                    }}
-                    .report-container {{
-                        max-width: 1200px;
-                        margin: 0 auto;
-                        background-color: white;
-                        border-radius: 12px;
-                        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                        overflow: hidden;
-                    }}
-                    h1, h2, h3, h4 {{
-                        color: var(--primary-color);
-                        margin-bottom: 1rem;
-                    }}
-                    h1 {{
-                        background-color: var(--primary-color);
-                        color: white;
-                        padding: 2rem;
-                        margin: 0;
-                        text-align: center;
-                    }}
-                    .timestamp {{
-                        text-align: right;
-                        color: #6c757d;
-                        padding: 1rem 2rem;
-                        border-bottom: 1px solid var(--border-color);
-                    }}
-                    .section {{
-                        padding: 2rem;
-                        border-bottom: 1px solid var(--border-color);
-                    }}
-                    .conditions-grid, .inventory-grid, .forecast-grid {{
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                        gap: 1.5rem;
-                        margin: 1.5rem 0;
-                    }}
-                    .condition-item, .inventory-item, .forecast-item, .route-segment {{
-                        background-color: var(--background-color);
-                        padding: 1.5rem;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    }}
-                    .label {{
-                        color: #6c757d;
-                        font-weight: 500;
-                    }}
-                    .value {{
-                        font-weight: 600;
-                        color: var(--primary-color);
-                    }}
-                    .risk-high {{ color: var(--accent-color); }}
-                    .risk-medium {{ color: #f39c12; }}
-                    .risk-low {{ color: #27ae60; }}
-                    .recommendations {{
-                        background-color: #e8f4f8;
-                        padding: 1.5rem;
-                        border-radius: 8px;
-                        margin-top: 1rem;
-                    }}
-                    .plotly-graph-div {{
-                        margin: 2rem 0;
-                        border-radius: 8px;
-                        overflow: hidden;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                    }}
-                    .segments-container {{
-                        display: flex;
-                        flex-direction: column;
-                        gap: 1rem;
-                        margin-top: 1rem;
-                    }}
-                    .route-segment {{
-                        background-color: var(--background-color);
-                        padding: 1rem;
-                        border-radius: 8px;
-                    }}
-                    .segment-time {{
-                        margin-bottom: 0.5rem;
-                        font-weight: 500;
-                    }}
-                    .segment-points {{
-                        color: #666;
-                        font-size: 0.9em;
-                    }}
-                    @media (max-width: 768px) {{
-                        body {{
-                            padding: 1rem;
-                        }}
-                        .section {{
-                            padding: 1.5rem;
-                        }}
-                        .conditions-grid, .inventory-grid, .forecast-grid {{
-                            grid-template-columns: 1fr;
-                        }}
-                    }}
-                </style>
-            </head>
-            <body>
-                <div class="report-container">
-                    <h1>{content.get('title', 'Snow Removal Report')}</h1>
-                    <div class="timestamp">Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</div>
-                    {sections_html}
+            data = json.loads(input_str)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON format: {str(e)}. Ensure the data is a valid JSON string and not double-encoded.")
+            
+        # Validate required sections
+        required_sections = ['weather_data', 'resource_data', 'route_data', 'fleet_data', 'alerts_data']
+        missing_sections = [section for section in required_sections if section not in data]
+        if missing_sections:
+            raise ValueError(f"Missing required sections: {', '.join(missing_sections)}")
+            
+        try:
+            weather_data = data['weather_data']
+            # Validate and sanitize weather_data structure
+            required_weather_fields = ['current_temp', 'current_conditions', 'accumulation', 'forecast', 'alerts']
+            for field in required_weather_fields:
+                if field not in weather_data or weather_data[field] is None:
+                    if field in ['current_temp', 'accumulation']:
+                        weather_data[field] = 0.0
+                    elif field == 'current_conditions':
+                        weather_data[field] = 'No data available'
+                    elif field == 'forecast':
+                        weather_data[field] = []
+                    elif field == 'alerts':
+                        weather_data[field] = []
+                
+            resource_data = data['resource_data']
+            # Validate and sanitize resource_data structure
+            required_resource_fields = ['salt_level', 'fuel_level', 'depots']
+            for field in required_resource_fields:
+                if field not in resource_data or resource_data[field] is None:
+                    if field in ['salt_level', 'fuel_level']:
+                        resource_data[field] = 0.0
+                    elif field == 'depots':
+                        resource_data[field] = []
+                
+            route_data = data['route_data']
+            # Validate and sanitize route_data structure
+            required_route_fields = ['active_routes', 'coverage', 'efficiency_scores', 'priority_zones']
+            for field in required_route_fields:
+                if field not in route_data or route_data[field] is None:
+                    if field == 'active_routes':
+                        route_data[field] = 0
+                    elif field == 'coverage':
+                        route_data[field] = 0.0
+                    elif field in ['efficiency_scores', 'priority_zones']:
+                        route_data[field] = {}
+                
+            fleet_data = data['fleet_data']
+            # Validate and sanitize fleet_data structure
+            if 'vehicles' not in fleet_data or fleet_data['vehicles'] is None:
+                fleet_data['vehicles'] = []
+                
+            alerts_data = data['alerts_data']
+            # Validate and sanitize alerts_data structure
+            if not isinstance(alerts_data, list) or alerts_data is None:
+                alerts_data = []
+                data['alerts_data'] = alerts_data
+            
+            # Add a system alert if any data is missing
+            has_missing_data = (
+                not weather_data['forecast'] or
+                not resource_data['depots'] or
+                not fleet_data['vehicles'] or
+                not route_data['efficiency_scores'] and not route_data['priority_zones']
+            )
+            if has_missing_data:
+                alerts_data.append({
+                    "level": "warning",
+                    "message": "Some data is currently unavailable. Dashboard showing partial information."
+                })
+                
+        except KeyError as e:
+            raise ValueError(f"Missing required field: {str(e)}")
+        except TypeError as e:
+            raise ValueError(f"Invalid data type in structure: {str(e)}")
+        # Read template
+        with open(self.template_path, 'r') as f:
+            template = f.read()
+            
+        # Generate timestamp for the report
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Replace weather data
+        weather_updates = {
+            'current_temp': f"{weather_data['current_temp']}°C",
+            'current_conditions': weather_data['current_conditions'],
+            'accumulation': f"{weather_data['accumulation']}cm",
+            'weather_chart_data': json.dumps({
+                'labels': [entry['time'] for entry in weather_data['forecast']],
+                'datasets': [
+                    {
+                        'label': 'Snowfall (cm/h)',
+                        'data': [entry['snowfall'] for entry in weather_data['forecast']],
+                        'borderColor': '#3498db',
+                        'tension': 0.4
+                    },
+                    {
+                        'label': 'Temperature (°C)',
+                        'data': [entry['temp'] for entry in weather_data['forecast']],
+                        'borderColor': '#e74c3c',
+                        'tension': 0.4
+                    }
+                ]
+            })
+        }
+        
+        # Replace resource data
+        resource_updates = {
+            'salt_level': f"{resource_data['salt_level']}%",
+            'fuel_level': f"{resource_data['fuel_level']}%",
+            'depots_table': '\n'.join([
+                f"""
+                <tr>
+                    <td>{depot['name']}</td>
+                    <td><span class="badge bg-{depot['status_color']}">{depot['status']}</span></td>
+                </tr>
+                """ for depot in resource_data['depots']
+            ])
+        }
+        
+        # Replace route data
+        route_updates = {
+            'active_routes': str(route_data['active_routes']),
+            'coverage': f"{route_data['coverage']}%",
+            'route_chart_data': json.dumps({
+                'labels': list(route_data['efficiency_scores'].keys()),
+                'datasets': [{
+                    'label': 'Route Efficiency Score',
+                    'data': list(route_data['efficiency_scores'].values()),
+                    'backgroundColor': '#3498db'
+                }]
+            }),
+            'priority_zones': '\n'.join([
+                f"""<div class="progress-bar bg-{color}" role="progressbar" 
+                    style="width: {percentage}%" aria-valuenow="{percentage}">
+                    {zone} ({percentage}%)</div>"""
+                for zone, (percentage, color) in route_data['priority_zones'].items()
+            ])
+        }
+        
+        # Replace fleet data
+        fleet_updates = {
+            'fleet_table': '\n'.join([
+                f"""
+                <tr>
+                    <td>{vehicle['id']}</td>
+                    <td><span class="badge bg-{vehicle['status_color']}">{vehicle['status']}</span></td>
+                    <td>{vehicle['region']}</td>
+                    <td>{vehicle['priority']}</td>
+                </tr>
+                """ for vehicle in fleet_data['vehicles']
+            ])
+        }
+        
+        # Replace alerts
+        alerts_updates = {
+            'alerts_section': '\n'.join([
+                f"""
+                <div class="alert alert-{alert['level']}" role="alert">
+                    <i class="fas fa-{self._get_alert_icon(alert['level'])}"></i> {alert['message']}
                 </div>
-            </body>
-            </html>
-            """
-            print("[DEBUG] Final HTML Content (first 500 chars):", html_content[:500])
-            try:
-                with open(report_path, 'w', encoding='utf-8') as f:
-                    f.write(html_content)
-                print("[DEBUG] Report successfully written to file.")
-            except Exception as e:
-                print(f"[ERROR] Writing report failed: {e}")
-                return f"Error writing report: {str(e)}"
-            return f"HTML report generated successfully: {report_path}"
-        except Exception as e:
-            print(f"[ERROR] Unexpected error: {e}")
-            return f"Error generating report: {str(e)}\nInput received: {tool_input}"
+                """ for alert in alerts_data
+            ])
+        }
+        
+        # Apply all updates to template
+        report_content = template
+        for key, value in {**weather_updates, **resource_updates, 
+                          **route_updates, **fleet_updates, 
+                          **alerts_updates}.items():
+            report_content = report_content.replace(f"{{{{data.{key}}}}}", str(value))
+            
+        # Save report
+        report_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))),
+            'reports',
+            f'snow_removal_report_{timestamp}.html'
+        )
+        
+        with open(report_path, 'w') as f:
+            f.write(report_content)
+            
+        return report_path
+        
+    def _get_alert_icon(self, level: str) -> str:
+        """Get the appropriate Font Awesome icon for alert level."""
+        return {
+            'danger': 'exclamation-circle',
+            'warning': 'exclamation-triangle',
+            'info': 'info-circle'
+        }.get(level, 'info-circle')
+
+    def update_report_data(self, report_path: str, 
+                          section: str, 
+                          data: Dict[str, Any]) -> None:
+        """
+        Update specific sections of an existing report with new data.
+        
+        Args:
+            report_path: Path to the report file
+            section: Section identifier ('weather', 'resources', 'routes', 'fleet', 'alerts')
+            data: New data for the section
+        """
+        # Implementation for real-time updates if needed
+        pass
+
+def create_tool() -> ReportGeneratorTool:
+    """Factory function to create an instance of the ReportGeneratorTool."""
+    return ReportGeneratorTool()

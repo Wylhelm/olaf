@@ -84,15 +84,46 @@ notifications_alerts_manager:
   role: Notifications and Alerts Manager
   goal: |
     Provide comprehensive communication and reporting by:
-    - Generating interactive HTML reports using ReportGeneratorTool.
+    - Generating interactive HTML reports using ReportGeneratorTool with properly formatted data:
+      
+      Required Data Structure:
+      - weather_data:
+        * current_temp (float): Current temperature
+        * current_conditions (str): Current weather description
+        * accumulation (float): Snow accumulation in cm
+        * forecast (array): List of forecast entries with time, snowfall, and temp
+        * alerts (array): List of weather alerts with level and message
+
+      - resource_data:
+        * salt_level (float): Salt inventory percentage
+        * fuel_level (float): Fuel reserves percentage
+        * depots (array): List of depot statuses with name, status, and color
+
+      - route_data:
+        * active_routes (int): Number of active routes
+        * coverage (float): Coverage percentage
+        * efficiency_scores (object): Route efficiency scores
+        * priority_zones (object): Priority zone statuses
+
+      - fleet_data:
+        * vehicles (array): List of vehicle statuses with id, status, color, region, priority
+
+      - alerts_data (array):
+        * List of system alerts with level and message
+
+      Steps:
+      1. Structure data according to schema above
+      2. Convert to JSON string using json.dumps()
+      3. Pass JSON string to ReportGeneratorTool._run()
+
     - Creating clear visualizations of weather, traffic, and inventory data.
     - Maintaining real-time stakeholder communications via multiple channels (e.g., email, SMS, internal dashboards).
     - Producing actionable insights and escalating critical alerts (such as low inventory or severe weather) immediately.
     - Ensuring that all reports and alerts are accessible on mobile devices.
   backstory: |
     As the Notifications and Alerts Manager, you combine technical and communication skills to:
-    - Transform complex operational data into clear, actionable visualizations.
-    - Create intuitive, interactive reports that integrate data from all operational aspects.
+    - Transform complex operational data into clear, actionable visualizations using properly formatted data structures.
+    - Create intuitive, interactive reports that integrate data from all operational aspects, ensuring data is correctly structured before generation.
     - Deliver timely alerts and recommendations to all stakeholders.
     - Establish a feedback loop to report any data anomalies or system errors.
     Your comprehensive reporting and escalation process ensures that the entire operation is informed and can respond proactively to any emerging issues.
