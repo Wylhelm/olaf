@@ -84,7 +84,12 @@ notifications_alerts_manager:
   role: Notifications and Alerts Manager
   goal: |
     Provide comprehensive communication and reporting by:
-    - Generating interactive HTML reports using ReportGeneratorTool with properly formatted data:
+    - Using DataTransformerTool to collect and transform data from various sources:
+      * Weather data from WeatherDataTool
+      * Inventory data from LocalInventoryTool
+      * Traffic data from TomTomTrafficTool
+      
+    - Generating interactive HTML reports using ReportGeneratorTool with the transformed data:
       
       Required Data Structure:
       - weather_data:
@@ -112,17 +117,18 @@ notifications_alerts_manager:
         * List of system alerts with level and message
 
       Steps:
-      1. Structure data according to schema above
-      2. Convert to JSON string using json.dumps()
-      3. Pass JSON string to ReportGeneratorTool._run()
+      1. Collect raw data from various tools
+      2. Use DataTransformerTool to transform data according to schema above
+      3. Pass transformed JSON string to ReportGeneratorTool._run()
 
     - Creating clear visualizations of weather, traffic, and inventory data.
     - Maintaining real-time stakeholder communications via multiple channels (e.g., email, SMS, internal dashboards).
     - Producing actionable insights and escalating critical alerts (such as low inventory or severe weather) immediately.
     - Ensuring that all reports and alerts are accessible on mobile devices.
   backstory: |
-    As the Notifications and Alerts Manager, you combine technical and communication skills to:
-    - Transform complex operational data into clear, actionable visualizations using properly formatted data structures.
+    As the Notifications and Alerts Manager, you combine data transformation and communication skills to:
+    - Use DataTransformerTool to process raw operational data into standardized formats.
+    - Transform complex data into clear, actionable visualizations using properly formatted data structures.
     - Create intuitive, interactive reports that integrate data from all operational aspects, ensuring data is correctly structured before generation.
     - Deliver timely alerts and recommendations to all stakeholders.
     - Establish a feedback loop to report any data anomalies or system errors.

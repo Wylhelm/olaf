@@ -3,6 +3,7 @@ from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import JSONSearchTool, ScrapeWebsiteTool
 from .tools.local_inventory_tool import LocalInventoryTool
 from .tools.report_generator_tool import ReportGeneratorTool
+from .tools.data_transformer_tool import DataTransformerTool
 from .tools.tomtom_traffic_tool import TomTomTrafficTool
 from .tools.weather_data_tool import WeatherDataTool
 from pathlib import Path
@@ -61,6 +62,7 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
             config=self.agents_config['notifications_alerts_manager'],
             tools=[
                 JSONSearchTool(),
+                DataTransformerTool(),
                 ReportGeneratorTool()
             ],
         )
@@ -119,8 +121,22 @@ class AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew():
             config=self.tasks_config['stakeholder_communication'],
             tools=[
                 JSONSearchTool(),
+                DataTransformerTool(),
                 ReportGeneratorTool()
-            ]
+            ],
+            description="""Transform collected data and generate a comprehensive snow removal operations report:
+            1. Use the data transformer tool to process data from:
+               - Weather monitor (current conditions and forecast)
+               - Stock resources manager (salt and fuel inventory)
+               - Route optimizer (traffic and route data)
+            2. Generate an interactive HTML report using the transformed data that includes:
+               - Current weather conditions and forecast
+               - Resource levels and depot status
+               - Route coverage and efficiency metrics
+               - Fleet status and deployment
+               - Critical alerts and notifications
+            
+            The report should provide stakeholders with clear insights into current operations and any areas needing attention."""
         )
 
     @crew

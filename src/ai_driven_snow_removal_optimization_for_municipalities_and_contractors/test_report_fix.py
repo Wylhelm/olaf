@@ -1,115 +1,90 @@
 import json
-from tools.report_generator_tool import create_tool
+from tools.report_generator_tool import create_tool as create_report_tool
+from tools.data_transformer_tool import create_tool as create_transformer_tool
 
-def test_report_generation():
-    # Create sample data following the exact schema
-    test_data = {
-        "weather_data": {
-            "current_temp": -9.72,
-            "current_conditions": "High risk of snow and icy conditions.",
-            "accumulation": 5.42,
-            "forecast": [
-                {
-                    "time": "Next hours",
-                    "snowfall": 5.42,
-                    "temp": -9.72
-                },
-                {
-                    "time": "Future",
-                    "snowfall": 2.32,
-                    "temp": -9.0
-                },
-                {
-                    "time": "Future",
-                    "snowfall": 1.83,
-                    "temp": -8.5
-                },
-                {
-                    "time": "Future",
-                    "snowfall": 0.37,
-                    "temp": -8.0
-                }
-            ],
-            "alerts": [
-                {
-                    "level": "High",
-                    "message": "Immediate action needed for predicted high snowfall."
-                }
-            ]
-        },
-        "resource_data": {
-            "salt_level": 575.0,
-            "fuel_level": 7500.0,
-            "depots": [
-                {
-                    "name": "Central Depot",
-                    "status": "Operational",
-                    "status_color": "Green"
-                },
-                {
-                    "name": "North Depot",
-                    "status": "Operational",
-                    "status_color": "Green"
-                }
-            ]
-        },
-        "route_data": {
-            "active_routes": 2,
-            "coverage": 80.0,
-            "efficiency_scores": {
-                "Route 138": 75.0,
-                "Rue de la rivière": 65.0
-            },
-            "priority_zones": {
-                "Centre Ville": [90.0, "High"],
-                "Levis": [75.0, "Medium"]
-            }
-        },
-        "fleet_data": {
-            "vehicles": [
-                {
-                    "id": "Truck 1",
-                    "status": "Active",
-                    "status_color": "Green",
-                    "region": "Centre Ville",
-                    "priority": "High"
-                },
-                {
-                    "id": "Truck 2",
-                    "status": "Active",
-                    "status_color": "Green",
-                    "region": "Levis",
-                    "priority": "Medium"
-                }
-            ]
-        },
-        "alerts_data": [
-            {
-                "level": "High",
-                "message": "Immediate action for snow removal in high priority zones"
-            },
-            {
-                "level": "Medium",
-                "message": "Monitor traffic incidents and adjust routes accordingly"
-            }
-        ]
-    }
-
-    # Create tool instance
-    report_tool = create_tool()
+def test_report_with_agent_data():
+    """Test report generation with the agent's data format."""
     
-    # Convert data to JSON string - this is the key part that was failing before
-    # We pass the data directly as a JSON string, not wrapped in another dictionary
-    input_str = json.dumps(test_data)
+    print("1. Preparing test data...")
     
-    # Generate report
+    # Sample data in the format provided by the agent
+    weather_data = json.dumps({
+        "current_temp": -9.64,
+        "current_conditions": "icy",
+        "accumulation": 0.0,
+        "forecast": [{
+            "time": "2025-02-14 00:00:00",
+            "snowfall": 0.232,
+            "temp": -12.42
+        }],
+        "alerts": [{
+            "level": "high",
+            "message": "Icy conditions alert"
+        }]
+    })
+    
+    fuel_data = json.dumps({
+        "fuel_level": 50.0
+    })
+    
+    salt_data = json.dumps({
+        "salt_level": 50.0
+    })
+    
+    traffic_data = json.dumps({
+        "active_routes": 8,
+        "coverage": 75.0,
+        "efficiency_scores": {
+            "Route_A": 95.0,
+            "Route_B": 85.0
+        },
+        "priority_zones": {
+            "Zone_1": [100.0, "high"],
+            "Zone_2": [80.0, "medium"]
+        }
+    })
+    
+    print("✓ Test data prepared")
+    
+    print("\n2. Transforming data...")
+    # Transform the data
+    transformer_tool = create_transformer_tool()
+    transformed_data = transformer_tool._run(
+        weather_data=weather_data,
+        fuel_data=fuel_data,
+        salt_data=salt_data,
+        traffic_data=traffic_data
+    )
+    print("✓ Data successfully transformed")
+    
+    # Validate transformation result
     try:
-        report_path = report_tool._run(input_str)
-        print(f"Report generated successfully at: {report_path}")
+        result_dict = json.loads(transformed_data)
+        if "error" in result_dict:
+            print(f"\nError: Transformation failed - {result_dict['error']}")
+            print(f"Details: {result_dict['details']}")
+            return None
+    except json.JSONDecodeError:
+        print("\nError: Failed to parse transformed data")
+        return None
+    
+    print("\n3. Generating report...")
+    # Generate report using transformed data
+    report_tool = create_report_tool()
+    try:
+        report_path = report_tool._run(transformed_data)
+        print(f"✓ Report generated successfully at: {report_path}")
         return report_path
     except Exception as e:
         print(f"Error generating report: {str(e)}")
         return None
 
 if __name__ == "__main__":
-    test_report_generation()
+    print("Starting report generation test with agent data...\n")
+    report_path = test_report_with_agent_data()
+    
+    if report_path:
+        print(f"\nTest completed successfully!")
+        print(f"You can view the report at: {report_path}")
+    else:
+        print("\nTest failed to generate report.")

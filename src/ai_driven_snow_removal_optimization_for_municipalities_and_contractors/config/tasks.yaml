@@ -174,9 +174,15 @@ stakeholder_communication:
   description: |
     Generate comprehensive reports and alerts using the enhanced ReportGeneratorTool:
 
-    1. Collect and Structure Data:
-       Gather data from various sources and structure it according to the ReportGeneratorTool schema.
-       The data structure should include:
+    1. Collect and Transform Data:
+       Use DataTransformerTool to collect data from various sources and transform it into the required format:
+       
+       Input Sources:
+       - WeatherDataTool: Current conditions and forecasts
+       - LocalInventoryTool: Salt and fuel inventory levels
+       - TomTomTrafficTool: Route and traffic information
+       
+       The DataTransformerTool will automatically structure the data according to this schema:
 
        - weather_data:
          * current_temp (float): Current temperature
@@ -203,8 +209,8 @@ stakeholder_communication:
          * List of system alerts with level and message
 
     2. Generate Report:
-       - Convert the structured data to a JSON string using json.dumps()
-       - Pass the JSON string directly to ReportGeneratorTool._run()
+       - Use DataTransformerTool._run() to transform the collected data into the proper JSON format
+       - Pass the transformed JSON string to ReportGeneratorTool._run()
        - Create interactive HTML reports with clear visualizations
        - Include weather condition maps, traffic overlays, and inventory dashboards
        - Provide detailed operational recommendations with data-driven justifications
@@ -222,7 +228,7 @@ stakeholder_communication:
     - An operational timeline with team assignments, milestones, and contingency procedures
     - Automated alerts and a real-time communication feed for stakeholders
 
-    The report must be generated using correctly structured data following the ReportGeneratorTool schema, with proper JSON string conversion using json.dumps().
+    The report must be generated using data transformed by the DataTransformerTool to ensure proper formatting and structure before being passed to the ReportGeneratorTool.
 
   agent: notifications_alerts_manager
   context:
