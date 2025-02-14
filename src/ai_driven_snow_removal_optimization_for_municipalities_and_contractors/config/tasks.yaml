@@ -1,4 +1,3 @@
----
 global_planning:
   description: |
     Create a comprehensive snow removal strategy for Quebec by:
@@ -80,11 +79,26 @@ weather_data_collection:
     - Validate forecast data against historical trends and local sensors.
     This data will be used to support route planning and resource allocation.
   expected_output: |
-    A detailed weather analysis report for Quebec including:
-    - Current weather conditions and validated alerts.
-    - Detailed snowfall and accumulation predictions.
-    - Road surface condition mapping.
-    - A 24-hour forecast with confidence levels.
+    JSON output must strictly follow this format (fields marked with their types):
+    
+    currentConditions:
+      temperature: float     # Current temperature
+      description: string    # Weather description
+      accumulation: float    # Snow accumulation
+    
+    forecast: array of:
+      time: string          # Forecast timestamp
+      snowfall: float       # Expected snowfall amount
+      temp: float          # Temperature
+    
+    alerts: array of:
+      level: string         # Alert severity level
+      message: string       # Alert description
+
+    Example of valid output structure:
+    - currentConditions has temperature=-5.2, description="Light snow", accumulation=3.5
+    - forecast contains entries like: time="2025-02-13T22:00:00", snowfall=2.1, temp=-4.8
+    - alerts contains entries like: level="warning", message="Heavy snowfall expected overnight"
   agent: weather_monitor
   context:
     - global_planning
@@ -99,11 +113,17 @@ traffic_data_integration:
     - Recommend alternative routes when critical incidents are detected.
     - Validate and cross-reference incident reports with historical data.
   expected_output: |
-    A comprehensive traffic analysis report including:
-    - Current traffic conditions and speed metrics.
-    - A list of incidents, closures, and their severities.
-    - Traffic flow patterns and predicted congestion periods.
-    - Recommended adjustments and alternative routing options.
+    JSON output must strictly follow this format (fields marked with their types):
+    
+    currentTrafficFlow:
+      speed: float          # Average traffic speed in km/h
+      incidents: array      # Array of incident descriptions as strings
+      roadClosures: array   # Array of road closure descriptions as strings
+
+    Example of valid output structure:
+    - speed=45.5
+    - incidents=["Minor accident at Boulevard Laurier", "Construction on Rue Saint-Jean"]
+    - roadClosures=["Avenue Cartier closed due to snow removal"]
   agent: route_optimizer
   context:
     - weather_data_collection
@@ -136,11 +156,18 @@ resource_monitoring:
     - Log and report any discrepancies for immediate action.
     - Provide fallback queries when initial search fails.
   expected_output: |
-    A detailed resource status report including:
-    - Current inventory levels (standardized units) for fuel and salt.
-    - Analysis of consumption rates and projected needs.
-    - Low inventory alerts with escalation recommendations.
-    - Resource allocation recommendations and source verification.
+    JSON output must strictly follow this format (fields marked with their types):
+    
+    diesel: float          # Diesel fuel level in liters
+    gasoline: float        # Gasoline level in liters
+    rockSalt: float        # Rock salt inventory in tons
+    treatedSalt: float     # Treated salt inventory in tons
+
+    Example of valid output structure:
+    - diesel=2500.5
+    - gasoline=1800.2
+    - rockSalt=45.8
+    - treatedSalt=32.4
   agent: stock_resources_manager
   context:
     - global_planning
