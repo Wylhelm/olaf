@@ -1,13 +1,18 @@
 #!/usr/bin/env python
-import sys
 import os
-from dotenv import load_dotenv
+import sys
+import warnings
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+# Suppress the specific pydantic warning about callable validation
+warnings.filterwarnings('ignore', message='.*is not a Python type.*', category=UserWarning)
 
 # Load environment variables from .env file in project root
 env_path = Path(__file__).parent.parent.parent / '.env'
 load_dotenv(env_path)
-#from ai_driven_snow_removal_optimization_for_municipalities_and_contractors.crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
+
 from .crew import AiDrivenSnowRemovalOptimizationForMunicipalitiesAndContractorsCrew
 
 def run():

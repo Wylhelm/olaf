@@ -146,12 +146,12 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Current Conditions</h6>
-                                <div class="metric-value">{{data.current_temp}}</div>
-                                <div class="metric-label">{{data.current_conditions}}</div>
+                                <div class="metric-value">0.0°C</div>
+                                <div class="metric-label">No data</div>
                             </div>
                             <div>
                                 <h6>Accumulation</h6>
-                                <div class="metric-value">{{data.accumulation}}</div>
+                                <div class="metric-value">0.0cm</div>
                                 <div class="metric-label">Last 6 hours</div>
                             </div>
                         </div>
@@ -172,14 +172,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6">
-                                <div class="metric-value" id="saltLevel">{{data.salt_level}}</div>
+                                <div class="metric-value" id="saltLevel">50.0%</div>
                                 <div class="metric-label">Salt Inventory</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="metric-value" id="fuelLevel">{{data.fuel_level}}</div>
+                                <div class="metric-value" id="fuelLevel">50.0%</div>
                                 <div class="metric-label">Fuel Reserves</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
@@ -190,7 +190,12 @@
                             <h6>Supply Depots Status</h6>
                             <table class="table table-sm">
                                 <tbody>
-                                    {{data.depots_table}}
+                                    
+                <tr>
+                    <td>Main Depot</td>
+                    <td><span class="badge bg-success">Operational</span></td>
+                </tr>
+                
                                 </tbody>
                             </table>
                         </div>
@@ -208,12 +213,12 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Active Routes</h6>
-                                <div class="metric-value">{{data.active_routes}}</div>
+                                <div class="metric-value">1</div>
                                 <div class="metric-label">Currently Operating</div>
                             </div>
                             <div>
                                 <h6>Coverage</h6>
-                                <div class="metric-value">{{data.coverage}}</div>
+                                <div class="metric-value">0.0%</div>
                                 <div class="metric-label">Priority Areas</div>
                             </div>
                         </div>
@@ -221,7 +226,15 @@
                         <div class="mt-3">
                             <h6>Priority Zones</h6>
                             <div class="progress mb-2" style="height: 20px;">
-                                {{data.priority_zones}}
+                                <div class="progress-bar bg-success" role="progressbar" 
+                    style="width: 80.0%" aria-valuenow="80.0">
+                    Highway Network (80.0%)</div>
+<div class="progress-bar bg-warning" role="progressbar" 
+                    style="width: 70.0%" aria-valuenow="70.0">
+                    Emergency Routes (70.0%)</div>
+<div class="progress-bar bg-danger" role="progressbar" 
+                    style="width: 60.0%" aria-valuenow="60.0">
+                    Commercial (60.0%)</div>
                             </div>
                         </div>
                     </div>
@@ -318,7 +331,14 @@
                                     </tr>
                                 </thead>
                                 <tbody id="fleetStatus">
-                                    {{data.fleet_table}}
+                                    
+                <tr>
+                    <td>Truck 1</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 1</td>
+                    <td>Medium</td>
+                </tr>
+                
                                 </tbody>
                             </table>
                         </div>
@@ -336,7 +356,21 @@
                         <h5 class="mb-0"><i class="fas fa-bell"></i> Alerts & Communications</h5>
                     </div>
                     <div class="card-body">
-                        {{data.alerts_section}}
+                        
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> Icy road conditions expected, proceed with caution.
+                </div>
+                
+
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> Salt inventory at 50.0%
+                </div>
+                
+
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> Fuel inventory at 50.0%
+                </div>
+                
                         <div class="mt-3">
                             <h6>Communication Channels</h6>
                             <div class="list-group">
@@ -373,8 +407,8 @@
 
         // Initialize chart data
         const chartData = {
-            weather: JSON.parse("{{data.weather_chart_data}}"),
-            route: JSON.parse("{{data.route_chart_data}}")
+            weather: JSON.parse("{\"labels\": [\"15:00:00\", \"18:00:00\"], \"datasets\": [{\"label\": \"Snowfall (cm/h)\", \"data\": [0.0, 0.0], \"borderColor\": \"#3498db\", \"tension\": 0.4}, {\"label\": \"Temperature (\\u00b0C)\", \"data\": [-12.13, -11.4], \"borderColor\": \"#e74c3c\", \"tension\": 0.4}]}"),
+            route: JSON.parse("{\"labels\": [\"Route 1\"], \"datasets\": [{\"label\": \"Route Efficiency Score\", \"data\": [85.0], \"backgroundColor\": \"#3498db\"}]}")
         };
 
         // Weather Chart
@@ -445,7 +479,7 @@
         // Initialize TomTom Map
         let map;
         try {
-            const tomtomApiKey = '{{data.tomtom_api_key}}';
+            const tomtomApiKey = '2eXarLSlIvKCNAb4t0jufAHY7KDbXPKx';
             if (!tomtomApiKey) {
                 console.error('TomTom API key is missing');
                 document.getElementById('map').innerHTML = '<div class="alert alert-danger">Map cannot be loaded: Missing API key</div>';
@@ -536,7 +570,7 @@
 
         // Initialize map data
         try {
-            const mapData = JSON.parse(`{{data.map_data}}`);
+            const mapData = JSON.parse(`{"routes": [{"id": "route1", "priority": 1, "geometry": {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[-71.208, 46.8139], [-71.2329, 46.8483], [-71.2757, 46.7737], [-71.1534, 46.8063]]}}}], "incidents": []}`);
             addRoutes(mapData.routes);
             addTrafficIncidents(mapData.incidents);
         } catch (error) {
