@@ -218,6 +218,25 @@ class DataTransformerTool(BaseTool):
                             "region": "Zone 1",
                             "priority": "High"
                         }]
+                    },
+                    "map_data": {
+                        "routes": [{
+                            "id": "route1",
+                            "priority": 1,
+                            "geometry": {
+                                "type": "Feature",
+                                "geometry": {
+                                    "type": "LineString",
+                                    "coordinates": [
+                                        [-71.2080, 46.8139],
+                                        [-71.2329, 46.8483],
+                                        [-71.2757, 46.7737],
+                                        [-71.1534, 46.8063]
+                                    ]
+                                }
+                            }
+                        }],
+                        "incidents": []
                     }
                 }
             
@@ -248,12 +267,32 @@ class DataTransformerTool(BaseTool):
                         }
                     }
             
+            # Parse traffic data if it's a string
+            if isinstance(traffic_data, str):
+                traffic_data = json.loads(traffic_data)
+
             current_traffic = traffic_data.get('currentTrafficFlow', {})
-            incidents = current_traffic.get('incidents', [])
+            incidents_list = current_traffic.get('incidents', [])
             road_closures = current_traffic.get('roadClosures', [])
             
+            # Extract route data from traffic response
+            route_data = current_traffic.get('optimized_route', {})
+            route_points = []
+            if route_data and 'routes' in route_data and route_data['routes']:
+                points = route_data['routes'][0].get('legs', [{}])[0].get('points', [])
+                route_points = [[point.get('longitude'), point.get('latitude')] for point in points if point.get('longitude') and point.get('latitude')]
+
+            # If no route points found, use default Quebec route
+            if not route_points:
+                route_points = [
+                    [-71.2080, 46.8139],
+                    [-71.2329, 46.8483],
+                    [-71.2757, 46.7737],
+                    [-71.1534, 46.8063]
+                ]
+
             # Calculate active routes based on incidents and closures
-            active_routes = max(1, len(incidents) + len(road_closures))
+            active_routes = max(1, len(incidents_list) + len(road_closures))
             
             # Calculate coverage based on traffic speed
             speed = float(current_traffic.get('speed', 0))
@@ -282,15 +321,54 @@ class DataTransformerTool(BaseTool):
                         "status": "Active",
                         "status_color": "success",
                         "region": f"Zone {i+1}",
-                        "priority": "High" if i < len(incidents) else "Medium"
+                        "priority": "High" if i < len(incidents_list) else "Medium"
                     }
                     for i in range(active_routes)
                 ]
             }
             
+            # Process incidents for map display
+            map_incidents = []
+            for incident in incidents_list:
+                if isinstance(incident, str):
+                    # Try to extract coordinates from string format
+                    try:
+                        coords = incident.split("at ")[1].split(", ")
+                        map_incidents.append({
+                            "type": 1,  # Default to accident type
+                            "description": incident,
+                            "longitude": float(coords[1]),
+                            "latitude": float(coords[0])
+                        })
+                    except (IndexError, ValueError):
+                        continue
+                elif isinstance(incident, dict) and 'geometry' in incident:
+                    coords = incident['geometry'].get('coordinates', [])
+                    if len(coords) >= 2:
+                        map_incidents.append({
+                            "type": incident.get('properties', {}).get('iconCategory', 1),
+                            "description": incident.get('properties', {}).get('description', 'No description'),
+                            "longitude": coords[0],
+                            "latitude": coords[1]
+                        })
+
             result = {
                 "route_data": route_data,
-                "fleet_data": fleet_data
+                "fleet_data": fleet_data,
+                "map_data": {
+                    "routes": [{
+                        "id": "route1",
+                        "priority": 1,
+                        "geometry": {
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": route_points
+                            }
+                        }
+                    }],
+                    "incidents": map_incidents
+                }
             }
             
             return result
@@ -362,6 +440,10 @@ class DataTransformerTool(BaseTool):
                     "message": f"Fuel inventory at {inventory_transformed['fuel_level']:.1f}%"
                 }
             ],
+            "map_data": traffic_transformed.get('map_data', {
+                "routes": [],
+                "incidents": []
+            }),
             "weather_chart_data": weather_transformed.get('weather_chart_data', '{}')
         }
         
