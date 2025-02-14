@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel='stylesheet' type='text/css' href='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps.css'>
-    <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps-web.min.js'></script>
+    <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps-web.min.js' crossorigin="anonymous"></script>
     <style>
         :root {
             --primary-color: #8c273b;
@@ -33,7 +33,7 @@
         }
         
         .logo-img {
-            max-height: 60px;
+            max-height: 100px;
             margin-right: 1rem;
         }
         
@@ -80,7 +80,7 @@
         .status-critical { background-color: #e74c3c; }
 
         #map {
-            height: 400px;
+            height: 500px;
             width: 100%;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -146,7 +146,7 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Current Conditions</h6>
-                                <div class="metric-value">-9.7°C</div>
+                                <div class="metric-value">-9.33°C</div>
                                 <div class="metric-label">Icy</div>
                             </div>
                             <div>
@@ -172,14 +172,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6">
-                                <div class="metric-value" id="saltLevel">100.0%</div>
+                                <div class="metric-value" id="saltLevel">85.0%</div>
                                 <div class="metric-label">Salt Inventory</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="metric-value" id="fuelLevel">100.0%</div>
+                                <div class="metric-value" id="fuelLevel">75.0%</div>
                                 <div class="metric-label">Fuel Reserves</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
@@ -192,20 +192,8 @@
                                 <tbody>
                                     
                 <tr>
-                    <td>Main Depot</td>
-                    <td><span class="badge bg-Green">Operational</span></td>
-                </tr>
-                
-
-                <tr>
-                    <td>East Depot</td>
-                    <td><span class="badge bg-Green">Operational</span></td>
-                </tr>
-                
-
-                <tr>
-                    <td>West Depot</td>
-                    <td><span class="badge bg-Green">Operational</span></td>
+                    <td>Central Depot</td>
+                    <td><span class="badge bg-green">Operational</span></td>
                 </tr>
                 
                                 </tbody>
@@ -225,12 +213,12 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Active Routes</h6>
-                                <div class="metric-value">2</div>
+                                <div class="metric-value">5</div>
                                 <div class="metric-label">Currently Operating</div>
                             </div>
                             <div>
                                 <h6>Coverage</h6>
-                                <div class="metric-value">80.0%</div>
+                                <div class="metric-value">75.0%</div>
                                 <div class="metric-label">Priority Areas</div>
                             </div>
                         </div>
@@ -238,12 +226,12 @@
                         <div class="mt-3">
                             <h6>Priority Zones</h6>
                             <div class="progress mb-2" style="height: 20px;">
-                                <div class="progress-bar bg-High" role="progressbar" 
+                                <div class="progress-bar bg-success" role="progressbar" 
                     style="width: 90.0%" aria-valuenow="90.0">
-                    Zone 1 (90.0%)</div>
-<div class="progress-bar bg-Medium" role="progressbar" 
-                    style="width: 70.0%" aria-valuenow="70.0">
-                    Zone 2 (70.0%)</div>
+                    Zone A (90.0%)</div>
+<div class="progress-bar bg-warning" role="progressbar" 
+                    style="width: 65.0%" aria-valuenow="65.0">
+                    Zone B (65.0%)</div>
                             </div>
                         </div>
                     </div>
@@ -342,18 +330,10 @@
                                 <tbody id="fleetStatus">
                                     
                 <tr>
-                    <td>Vehicle 1</td>
-                    <td><span class="badge bg-Green">Active</span></td>
+                    <td>V001</td>
+                    <td><span class="badge bg-green">In Transit</span></td>
                     <td>North</td>
                     <td>High</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Vehicle 2</td>
-                    <td><span class="badge bg-Green">Active</span></td>
-                    <td>East</td>
-                    <td>Medium</td>
                 </tr>
                 
                                 </tbody>
@@ -374,13 +354,13 @@
                     </div>
                     <div class="card-body">
                         
-                <div class="alert alert-Critical" role="alert">
-                    <i class="fas fa-info-circle"></i> Low treated salt stock
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> Low gasoline inventory
                 </div>
                 
 
-                <div class="alert alert-Warning" role="alert">
-                    <i class="fas fa-info-circle"></i> Diesel running low in East Depot
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> All routes operational
                 </div>
                 
                         <div class="mt-3">
@@ -419,8 +399,8 @@
 
         // Initialize chart data
         const chartData = {
-            weather: JSON.parse(`{"labels": ["next hour", "next 2 hours", "next 3 hours"], "datasets": [{"label": "Snowfall (cm/h)", "data": [5.42, 2.32, 1.83], "borderColor": "#3498db", "tension": 0.4}, {"label": "Temperature (\u00b0C)", "data": [-9.0, -10.0, -11.0], "borderColor": "#e74c3c", "tension": 0.4}]}`),
-            route: JSON.parse(`{"labels": ["Route A", "Route B"], "datasets": [{"label": "Route Efficiency Score", "data": [85.0, 90.0], "backgroundColor": "#3498db"}]}`)
+            weather: JSON.parse("{\"labels\": [\"2025-02-14 00:00:00\", \"2025-02-14 03:00:00\", \"2025-02-14 06:00:00\"], \"datasets\": [{\"label\": \"Snowfall (cm/h)\", \"data\": [2.32, 1.83, 0.37], \"borderColor\": \"#3498db\", \"tension\": 0.4}, {\"label\": \"Temperature (\\u00b0C)\", \"data\": [-9.33, -9.33, -9.33], \"borderColor\": \"#e74c3c\", \"tension\": 0.4}]}"),
+            route: JSON.parse("{\"labels\": [\"Main Route\"], \"datasets\": [{\"label\": \"Route Efficiency Score\", \"data\": [88.0], \"backgroundColor\": \"#3498db\"}]}")
         };
 
         // Weather Chart
@@ -489,20 +469,35 @@
         });
 
         // Initialize TomTom Map
-        const map = tt.map({
-            key: '2eXarLSlIvKCNAb4t0jufAHY7KDbXPKx',
-            container: 'map',
-            center: [-71.2108, 46.8139], // Quebec City coordinates
-            zoom: 11
-        });
+        let map;
+        try {
+            const tomtomApiKey = '2eXarLSlIvKCNAb4t0jufAHY7KDbXPKx';
+            if (!tomtomApiKey) {
+                console.error('TomTom API key is missing');
+                document.getElementById('map').innerHTML = '<div class="alert alert-danger">Map cannot be loaded: Missing API key</div>';
+            } else {
+                map = tt.map({
+                    key: tomtomApiKey,
+                    container: 'map',
+                    center: [-71.2108, 46.8139], // Quebec City coordinates
+                    zoom: 11,
+                    style: 'https://api.tomtom.com/style/1/style/22.2.1-*?map=2/basic_street-light&key=' + tomtomApiKey
+                });
+            }
+        } catch (error) {
+            console.error('Error initializing map:', error);
+            document.getElementById('map').innerHTML = '<div class="alert alert-danger">Map cannot be loaded: ' + error.message + '</div>';
+        }
 
-        // Add map controls
-        map.addControl(new tt.NavigationControl());
-        map.addControl(new tt.FullscreenControl());
+        // Add map controls if map was initialized
+        if (map) {
+            map.addControl(new tt.NavigationControl());
+            map.addControl(new tt.FullscreenControl());
+        }
 
         // Function to add route layers
         function addRoutes(routes) {
-            if (!routes) return;
+            if (!routes || !map) return;
             
             const routeColors = {
                 1: '#003DA5', // Priority 1 - Quebec Blue
@@ -532,7 +527,7 @@
 
         // Function to add traffic incidents
         function addTrafficIncidents(incidents) {
-            if (!incidents) return;
+            if (!incidents || !map) return;
 
             incidents.forEach(incident => {
                 const el = document.createElement('div');
@@ -554,7 +549,7 @@
 
         // Initialize map data
         try {
-            const mapData = JSON.parse(`{"routes": [{"id": "Route 1", "priority": 1, "geometry": {"type": "LineString", "coordinates": [[-71.20744, 46.81389], [-71.20744, 46.81371]]}}, {"id": "Route 2", "priority": 2, "geometry": {"type": "LineString", "coordinates": [[-71.21227, 46.81445], [-71.21716, 46.81421]]}}], "incidents": [{"longitude": -71.207, "latitude": 46.814, "type": "Accident", "description": "Two vehicle collision"}, {"longitude": -71.214, "latitude": 46.815, "type": "Road Closure", "description": "Major construction"}]}`);
+            const mapData = JSON.parse(`{{data.map_data}}`);
             addRoutes(mapData.routes);
             addTrafficIncidents(mapData.incidents);
         } catch (error) {

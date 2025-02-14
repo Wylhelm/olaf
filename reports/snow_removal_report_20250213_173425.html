@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel='stylesheet' type='text/css' href='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps.css'>
+    <script src='https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.23.0/maps/maps-web.min.js' crossorigin="anonymous"></script>
     <style>
         :root {
             --primary-color: #8c273b;
@@ -31,7 +33,7 @@
         }
         
         .logo-img {
-            max-height: 60px;
+            max-height: 100px;
             margin-right: 1rem;
         }
         
@@ -76,6 +78,34 @@
         .status-optimal { background-color: #2ecc71; }
         .status-warning { background-color: #f1c40f; }
         .status-critical { background-color: #e74c3c; }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .map-legend {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .map-legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .map-legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
@@ -104,9 +134,10 @@
             </button>
         </div>
 
-        <div class="row">
+        <!-- First Row -->
+        <div class="row mb-4">
             <!-- Weather Monitoring Section (Weather Monitor Agent) -->
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-cloud"></i> Weather Monitoring</h5>
@@ -115,12 +146,12 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Current Conditions</h6>
-                                <div class="metric-value">-9.72°C</div>
-                                <div class="metric-label">High risk of snow and icy conditions.</div>
+                                <div class="metric-value">0.0°C</div>
+                                <div class="metric-label">Error</div>
                             </div>
                             <div>
                                 <h6>Accumulation</h6>
-                                <div class="metric-value">5.42cm</div>
+                                <div class="metric-value">0.0cm</div>
                                 <div class="metric-label">Last 6 hours</div>
                             </div>
                         </div>
@@ -133,7 +164,7 @@
             </div>
 
             <!-- Resource Management Section (Stock Resources Manager Agent) -->
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-boxes"></i> Resource Management</h5>
@@ -141,14 +172,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6">
-                                <div class="metric-value" id="saltLevel">575.0%</div>
+                                <div class="metric-value" id="saltLevel">50.0%</div>
                                 <div class="metric-label">Salt Inventory</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="metric-value" id="fuelLevel">7500.0%</div>
+                                <div class="metric-value" id="fuelLevel">50.0%</div>
                                 <div class="metric-label">Fuel Reserves</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
@@ -161,14 +192,8 @@
                                 <tbody>
                                     
                 <tr>
-                    <td>Central Depot</td>
-                    <td><span class="badge bg-Green">Operational</span></td>
-                </tr>
-                
-
-                <tr>
-                    <td>North Depot</td>
-                    <td><span class="badge bg-Green">Operational</span></td>
+                    <td>Main Depot</td>
+                    <td><span class="badge bg-warning">Unknown</span></td>
                 </tr>
                 
                                 </tbody>
@@ -178,8 +203,8 @@
                 </div>
             </div>
 
-            <!-- Route Optimization Section (Route Optimizer Agent) -->
-            <div class="col-md-6 col-lg-4">
+            <!-- Route Optimization Section -->
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-route"></i> Route Optimization</h5>
@@ -188,12 +213,12 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Active Routes</h6>
-                                <div class="metric-value">2</div>
+                                <div class="metric-value">1</div>
                                 <div class="metric-label">Currently Operating</div>
                             </div>
                             <div>
                                 <h6>Coverage</h6>
-                                <div class="metric-value">80.0%</div>
+                                <div class="metric-value">75.0%</div>
                                 <div class="metric-label">Priority Areas</div>
                             </div>
                         </div>
@@ -201,20 +226,26 @@
                         <div class="mt-3">
                             <h6>Priority Zones</h6>
                             <div class="progress mb-2" style="height: 20px;">
-                                <div class="progress-bar bg-High" role="progressbar" 
-                    style="width: 90.0%" aria-valuenow="90.0">
-                    Centre Ville (90.0%)</div>
-<div class="progress-bar bg-Medium" role="progressbar" 
-                    style="width: 75.0%" aria-valuenow="75.0">
-                    Levis (75.0%)</div>
+                                <div class="progress-bar bg-success" role="progressbar" 
+                    style="width: 80.0%" aria-valuenow="80.0">
+                    Highway Network (80.0%)</div>
+<div class="progress-bar bg-warning" role="progressbar" 
+                    style="width: 70.0%" aria-valuenow="70.0">
+                    Emergency Routes (70.0%)</div>
+<div class="progress-bar bg-danger" role="progressbar" 
+                    style="width: 60.0%" aria-valuenow="60.0">
+                    Commercial (60.0%)</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Global Operations Section (Global Planification Agent) -->
-            <div class="col-md-6 col-lg-4">
+        <!-- Second Row -->
+        <div class="row mb-4">
+            <!-- Global Operations Section -->
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-globe"></i> Global Operations</h5>
@@ -242,8 +273,48 @@
                 </div>
             </div>
 
-            <!-- Equipment Status -->
-            <div class="col-md-6 col-lg-4">
+            <!-- Route Map Section -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-map-marked-alt"></i> Route Map & Traffic Incidents</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="map"></div>
+                        <div class="map-legend">
+                            <div class="row">
+                                <div class="col-6 col-lg-3">
+                                    <div class="map-legend-item">
+                                        <div class="map-legend-color" style="background-color: #003DA5;"></div>
+                                        <span>Priority 1</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="map-legend-item">
+                                        <div class="map-legend-color" style="background-color: #4CAF50;"></div>
+                                        <span>Priority 2</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="map-legend-item">
+                                        <div class="map-legend-color" style="background-color: #FFC107;"></div>
+                                        <span>Priority 3</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-lg-3">
+                                    <div class="map-legend-item">
+                                        <div class="map-legend-color" style="background-color: #e74c3c;"></div>
+                                        <span>Incidents</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fleet Status Section -->
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-truck-plow"></i> Fleet Status</h5>
@@ -263,17 +334,9 @@
                                     
                 <tr>
                     <td>Truck 1</td>
-                    <td><span class="badge bg-Green">Active</span></td>
-                    <td>Centre Ville</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 1</td>
                     <td>High</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 2</td>
-                    <td><span class="badge bg-Green">Active</span></td>
-                    <td>Levis</td>
-                    <td>Medium</td>
                 </tr>
                 
                                 </tbody>
@@ -282,22 +345,35 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Alerts and Communications Section (Notifications Manager Agent) -->
-            <div class="col-md-6 col-lg-4">
+        <!-- Third Row -->
+        <div class="row mb-4">
+            <!-- Alerts and Communications Section -->
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-bell"></i> Alerts & Communications</h5>
                     </div>
                     <div class="card-body">
                         
-                <div class="alert alert-High" role="alert">
-                    <i class="fas fa-info-circle"></i> Immediate action for snow removal in high priority zones
+                <div class="alert alert-error" role="alert">
+                    <i class="fas fa-info-circle"></i> Failed to transform weather data: Expecting value: line 1 column 1 (char 0)
                 </div>
                 
 
-                <div class="alert alert-Medium" role="alert">
-                    <i class="fas fa-info-circle"></i> Monitor traffic incidents and adjust routes accordingly
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> Salt inventory at 50.0%
+                </div>
+                
+
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle"></i> Fuel inventory at 50.0%
+                </div>
+                
+
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> Some data is currently unavailable. Dashboard showing partial information.
                 </div>
                 
                         <div class="mt-3">
@@ -336,8 +412,8 @@
 
         // Initialize chart data
         const chartData = {
-            weather: JSON.parse(`{"labels": ["Next hours", "Future", "Future", "Future"], "datasets": [{"label": "Snowfall (cm/h)", "data": [5.42, 2.32, 1.83, 0.37], "borderColor": "#3498db", "tension": 0.4}, {"label": "Temperature (\u00b0C)", "data": [-9.72, -9.0, -8.5, -8.0], "borderColor": "#e74c3c", "tension": 0.4}]}`),
-            route: JSON.parse(`{"labels": ["Route 138", "Rue de la rivi\u00e8re"], "datasets": [{"label": "Route Efficiency Score", "data": [75.0, 65.0], "backgroundColor": "#3498db"}]}`)
+            weather: JSON.parse(`{"labels": [], "datasets": [{"label": "Snowfall (cm/h)", "data": [], "borderColor": "#3498db", "tension": 0.4}, {"label": "Temperature (\u00b0C)", "data": [], "borderColor": "#e74c3c", "tension": 0.4}]}`),
+            route: JSON.parse(`{"labels": ["Route 1"], "datasets": [{"label": "Route Efficiency Score", "data": [85.0], "backgroundColor": "#3498db"}]}`)
         };
 
         // Weather Chart
@@ -404,6 +480,94 @@
                 }
             }
         });
+
+        // Initialize TomTom Map
+        let map;
+        try {
+            const tomtomApiKey = '2eXarLSlIvKCNAb4t0jufAHY7KDbXPKx';
+            if (!tomtomApiKey) {
+                console.error('TomTom API key is missing');
+                document.getElementById('map').innerHTML = '<div class="alert alert-danger">Map cannot be loaded: Missing API key</div>';
+            } else {
+                map = tt.map({
+                    key: tomtomApiKey,
+                    container: 'map',
+                    center: [-71.2108, 46.8139], // Quebec City coordinates
+                    zoom: 11,
+                    style: 'https://api.tomtom.com/style/1/style/22.2.1-*?map=2/basic_street-light&key=' + tomtomApiKey
+                });
+            }
+        } catch (error) {
+            console.error('Error initializing map:', error);
+            document.getElementById('map').innerHTML = '<div class="alert alert-danger">Map cannot be loaded: ' + error.message + '</div>';
+        }
+
+        // Add map controls if map was initialized
+        if (map) {
+            map.addControl(new tt.NavigationControl());
+            map.addControl(new tt.FullscreenControl());
+        }
+
+        // Function to add route layers
+        function addRoutes(routes) {
+            if (!routes || !map) return;
+            
+            const routeColors = {
+                1: '#003DA5', // Priority 1 - Quebec Blue
+                2: '#4CAF50', // Priority 2 - Green
+                3: '#FFC107'  // Priority 3 - Yellow
+            };
+
+            routes.forEach(route => {
+                const color = routeColors[route.priority] || '#003DA5';
+                
+                new tt.LngLatBounds();
+                
+                map.addLayer({
+                    id: `route-${route.id}`,
+                    type: 'line',
+                    source: {
+                        type: 'geojson',
+                        data: route.geometry
+                    },
+                    paint: {
+                        'line-color': color,
+                        'line-width': 4
+                    }
+                });
+            });
+        }
+
+        // Function to add traffic incidents
+        function addTrafficIncidents(incidents) {
+            if (!incidents || !map) return;
+
+            incidents.forEach(incident => {
+                const el = document.createElement('div');
+                el.className = 'marker';
+                el.style.backgroundColor = '#e74c3c';
+                el.style.width = '15px';
+                el.style.height = '15px';
+                el.style.borderRadius = '50%';
+                el.style.border = '2px solid white';
+                el.style.boxShadow = '0 0 4px rgba(0,0,0,0.3)';
+
+                new tt.Marker({element: el})
+                    .setLngLat([incident.longitude, incident.latitude])
+                    .setPopup(new tt.Popup({offset: 25})
+                        .setHTML(`<strong>${incident.type}</strong><br>${incident.description}`))
+                    .addTo(map);
+            });
+        }
+
+        // Initialize map data
+        try {
+            const mapData = JSON.parse(`{{data.map_data}}`);
+            addRoutes(mapData.routes);
+            addTrafficIncidents(mapData.incidents);
+        } catch (error) {
+            console.error('Error initializing map data:', error);
+        }
     </script>
 </body>
 </html>

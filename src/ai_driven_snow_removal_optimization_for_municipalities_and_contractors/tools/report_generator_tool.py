@@ -232,12 +232,31 @@ class ReportGeneratorTool(BaseTool):
             ])
         }
         
+        # Get TomTom API key from environment
+        tomtom_api_key = os.getenv('TOMTOM_API_KEY')
+        if not tomtom_api_key:
+            print("Warning: TOMTOM_API_KEY not found in environment variables")
+            tomtom_api_key = ''
+
         # Apply all updates to template
         report_content = template
-        for key, value in {**weather_updates, **resource_updates, 
-                          **route_updates, **fleet_updates, 
-                          **alerts_updates}.items():
-            report_content = report_content.replace(f"{{{{data.{key}}}}}", str(value))
+        for key, value in {
+            **weather_updates, 
+            **resource_updates, 
+            **route_updates, 
+            **fleet_updates, 
+            **alerts_updates,
+            'tomtom_api_key': tomtom_api_key
+        }.items():
+            placeholder = f"{{{{data.{key}}}}}"
+            if key in ['weather_chart_data', 'route_chart_data']:
+                # For chart data, we need to ensure it's properly escaped for JavaScript
+                report_content = report_content.replace(
+                    placeholder,
+                    value.replace('\\', '\\\\').replace('"', '\\"')
+                )
+            else:
+                report_content = report_content.replace(placeholder, str(value))
             
         # Save report
         report_path = os.path.join(
