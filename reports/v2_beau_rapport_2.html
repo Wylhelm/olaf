@@ -146,8 +146,8 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Current Conditions</h6>
-                                <div class="metric-value">-8.76°C</div>
-                                <div class="metric-label">Potential icy conditions</div>
+                                <div class="metric-value">-9.23°C</div>
+                                <div class="metric-label">Potential ice on roads</div>
                             </div>
                             <div>
                                 <h6>Accumulation</h6>
@@ -172,14 +172,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6">
-                                <div class="metric-value" id="saltLevel">61.96%</div>
+                                <div class="metric-value" id="saltLevel">50.0%</div>
                                 <div class="metric-label">Salt Inventory</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="metric-value" id="fuelLevel">85.0%</div>
+                                <div class="metric-value" id="fuelLevel">50.0%</div>
                                 <div class="metric-label">Fuel Reserves</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
@@ -192,7 +192,19 @@
                                 <tbody>
                                     
                 <tr>
-                    <td>Depot1</td>
+                    <td>Main Depot</td>
+                    <td><span class="badge bg-success">Operational</span></td>
+                </tr>
+                
+
+                <tr>
+                    <td>West Depot</td>
+                    <td><span class="badge bg-success">Operational</span></td>
+                </tr>
+                
+
+                <tr>
+                    <td>East Depot</td>
                     <td><span class="badge bg-success">Operational</span></td>
                 </tr>
                 
@@ -218,7 +230,7 @@
                             </div>
                             <div>
                                 <h6>Coverage</h6>
-                                <div class="metric-value">80.0%</div>
+                                <div class="metric-value">22.0%</div>
                                 <div class="metric-label">Priority Areas</div>
                             </div>
                         </div>
@@ -228,13 +240,13 @@
                             <div class="progress mb-2" style="height: 20px;">
                                 <div class="progress-bar bg-success" role="progressbar" 
                     style="width: 80.0%" aria-valuenow="80.0">
-                    Zone1 (80.0%)</div>
+                    Highway Network (80.0%)</div>
 <div class="progress-bar bg-warning" role="progressbar" 
-                    style="width: 60.0%" aria-valuenow="60.0">
-                    Zone2 (60.0%)</div>
+                    style="width: 70.0%" aria-valuenow="70.0">
+                    Emergency Routes (70.0%)</div>
 <div class="progress-bar bg-danger" role="progressbar" 
-                    style="width: 40.0%" aria-valuenow="40.0">
-                    Zone3 (40.0%)</div>
+                    style="width: 60.0%" aria-valuenow="60.0">
+                    Commercial (60.0%)</div>
                             </div>
                         </div>
                     </div>
@@ -333,10 +345,82 @@
                                 <tbody id="fleetStatus">
                                     
                 <tr>
-                    <td>V1</td>
-                    <td><span class="badge bg-success">active</span></td>
-                    <td>Urban</td>
-                    <td>high</td>
+                    <td>Truck 1</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 1</td>
+                    <td>High</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 2</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 2</td>
+                    <td>High</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 3</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 3</td>
+                    <td>High</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 4</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 4</td>
+                    <td>High</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 5</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 5</td>
+                    <td>High</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 6</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 6</td>
+                    <td>Medium</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 7</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 7</td>
+                    <td>Medium</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 8</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 8</td>
+                    <td>Medium</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 9</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 9</td>
+                    <td>Medium</td>
+                </tr>
+                
+
+                <tr>
+                    <td>Truck 10</td>
+                    <td><span class="badge bg-success">Active</span></td>
+                    <td>Zone 10</td>
+                    <td>Medium</td>
                 </tr>
                 
                                 </tbody>
@@ -358,12 +442,7 @@
                     <div class="card-body">
                         
                 <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle"></i> Salt inventory sufficient
-                </div>
-                
-
-                <div class="alert alert-warning" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i> Anticipate increased fuel need
+                    <i class="fas fa-info-circle"></i> Real-time communication feed active. All teams are standing by for updates and contingency actions as per the operational timeline.
                 </div>
                 
                         <div class="mt-3">
@@ -402,8 +481,8 @@
 
         // Initialize chart data
         const chartData = {
-            weather: JSON.parse("{\"labels\": [\"2025-02-14T21:00:00\", \"2025-02-15T12:00:00\"], \"datasets\": [{\"label\": \"Snowfall (cm/h)\", \"data\": [0.0, 0.0], \"borderColor\": \"#3498db\", \"tension\": 0.4}, {\"label\": \"Temperature (\\u00b0C)\", \"data\": [-9.26, -24.97], \"borderColor\": \"#e74c3c\", \"tension\": 0.4}]}"),
-            route: JSON.parse("{\"labels\": [\"Main\"], \"datasets\": [{\"label\": \"Route Efficiency Score\", \"data\": [76.0], \"backgroundColor\": \"#3498db\"}]}")
+            weather: JSON.parse("{\"labels\": [\"2025-02-14T21:00:00\", \"2025-02-15T00:00:00\", \"2025-02-15T03:00:00\", \"2025-02-15T06:00:00\", \"2025-02-15T09:00:00\", \"2025-02-15T12:00:00\", \"2025-02-15T15:00:00\"], \"datasets\": [{\"label\": \"Snowfall (cm/h)\", \"data\": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], \"borderColor\": \"#3498db\", \"tension\": 0.4}, {\"label\": \"Temperature (\\u00b0C)\", \"data\": [-9.23, -10.62, -13.8, -19.3, -22.42, -24.97, -16.5], \"borderColor\": \"#e74c3c\", \"tension\": 0.4}]}"),
+            route: JSON.parse("{\"labels\": [\"Route 1\", \"Route 2\", \"Route 3\", \"Route 4\", \"Route 5\", \"Route 6\", \"Route 7\", \"Route 8\", \"Route 9\", \"Route 10\"], \"datasets\": [{\"label\": \"Route Efficiency Score\", \"data\": [85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0], \"backgroundColor\": \"#3498db\"}]}")
         };
 
         // Weather Chart

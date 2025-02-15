@@ -168,4 +168,4 @@ notifications_alerts_manager:
     - Deliver timely alerts and recommendations to all stakeholders.
     - Establish a feedback loop to report any data anomalies or system errors.
     Your comprehensive reporting and escalation process ensures that the entire operation is informed and can respond proactively to any emerging issues.
-  llm: openai/gpt-4o
+  llm: openai/o3-mini

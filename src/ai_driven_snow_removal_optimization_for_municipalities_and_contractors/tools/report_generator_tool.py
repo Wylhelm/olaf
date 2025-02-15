@@ -246,70 +246,22 @@ class ReportGeneratorTool(BaseTool):
             except json.JSONDecodeError:
                 traffic_data = {}
 
-        # Extract incidents from traffic data
+        # Extract incidents and routes from traffic data
         incidents_data = []
-        if 'incidents' in traffic_data:
-            for incident in traffic_data['incidents'].get('incidents', []):
-                incident_type = 0  # Default unknown
-                if 'properties' in incident:
-                    category = incident['properties'].get('iconCategory')
-                    # Map TomTom incident categories to our types
-                    if category == 1:  # Accident
-                        incident_type = 1
-                    elif category == 6:  # Road Closed
-                        incident_type = 2
-                    elif category == 8:  # Road Works
-                        incident_type = 3
-                    elif category == 9:  # Traffic Jam
-                        incident_type = 4
-
-                if 'geometry' in incident and 'coordinates' in incident['geometry']:
-                    coords = incident['geometry']['coordinates']
-                    incidents_data.append({
-                        'type': incident_type,
-                        'description': incident['properties'].get('description', 'No description'),
-                        'longitude': coords[0],
-                        'latitude': coords[1]
-                    })
-
-        # Extract route from traffic data
         routes_data = []
-        if 'optimized_route' in traffic_data:
-            route = traffic_data['optimized_route']
-            if 'routes' in route and len(route['routes']) > 0:
-                route_points = route['routes'][0].get('legs', [{}])[0].get('points', [])
-                if route_points:
-                    coordinates = [[point.get('longitude'), point.get('latitude')] for point in route_points]
-                    routes_data.append({
-                        'id': 'route1',
-                        'priority': 1,
-                        'geometry': {
-                            'type': 'Feature',
-                            'geometry': {
-                                'type': 'LineString',
-                                'coordinates': coordinates
-                            }
-                        }
-                    })
 
-        # If no route data found, use default route
-        if not routes_data:
-            routes_data = [{
-                'id': 'route1',
-                'priority': 1,
-                'geometry': {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'LineString',
-                        'coordinates': [
-                            [-71.2080, 46.8139],  # Old Quebec
-                            [-71.2329, 46.8483],  # Saint-Roch
-                            [-71.2757, 46.7737],  # Sainte-Foy
-                            [-71.1534, 46.8063]   # Beauport
-                        ]
-                    }
-                }
-            }]
+        if isinstance(traffic_data, dict):
+            # Process routes
+            if 'routes' in traffic_data:
+                routes_data = traffic_data['routes']
+            
+            # Process incidents
+            if 'incidents' in traffic_data:
+                incidents_data = traffic_data['incidents']
+            
+            # Process road closures
+            if 'roadClosures' in traffic_data:
+                incidents_data.extend(traffic_data['roadClosures'])
 
         # Prepare map data
         map_data = {
@@ -326,11 +278,11 @@ class ReportGeneratorTool(BaseTool):
             **fleet_updates, 
             **alerts_updates,
             'tomtom_api_key': tomtom_api_key,
-            'map_data': json.dumps(map_data)
+            'map_data': json.dumps(map_data, separators=(',', ':'), ensure_ascii=False).replace('"', '\\"')
         }.items():
             placeholder = f"{{{{data.{key}}}}}"
-            if key in ['weather_chart_data', 'route_chart_data']:
-                # For chart data, we need to ensure it's properly escaped for JavaScript
+            if key in ['weather_chart_data', 'route_chart_data', 'map_data']:
+                # For chart/map data, we need to ensure it's properly escaped for JavaScript
                 report_content = report_content.replace(
                     placeholder,
                     value.replace('\\', '\\\\').replace('"', '\\"')

@@ -20,13 +20,13 @@ class LocalInventoryTool(BaseTool):
     description: str = """
     Search and retrieve inventory data from local JSON files.
     Available data includes:
-    - Current inventory levels
-    - Usage rates and patterns
-    - Thresholds and alerts
-    - Historical data
+    - Current quantities and capacities
+    - Storage locations and depots
+    - Minimum thresholds and pricing
+    - Last refill and update dates
     Valid search paths:
-    - fuel_inv.json: Fuel-related data
-    - salt_inv.json: Salt-related data
+    - fuel_inv.json: Fuel inventory (diesel and gasoline)
+    - salt_inv.json: Salt inventory (rock salt and treated salt)
     Returns structured inventory data or suggestions for retry if no match is found.
     """
     args_schema: Type[BaseModel] = LocalInventoryToolInput
@@ -36,41 +36,8 @@ class LocalInventoryTool(BaseTool):
     }
 
     def _initialize_inventory_files(self) -> None:
-        base_path = Path(__file__).parent.parent
-        default_data = {
-            'fuel': {
-                'inventory': {
-                    'current_level': 2000,
-                    'unit': 'liters',
-                    'threshold': 500,
-                    'usage_rate': '400 liters per storm',
-                    'last_updated': None
-                },
-                'metadata': {
-                    'type': 'fuel',
-                    'measuring_unit': 'liters',
-                    'update_frequency': 'hourly'
-                }
-            },
-            'salt': {
-                'inventory': {
-                    'current_level': 500,
-                    'unit': 'tons',
-                    'threshold': 100,
-                    'usage_rate': '50 tons per storm',
-                    'last_updated': None
-                },
-                'metadata': {
-                    'type': 'salt',
-                    'measuring_unit': 'tons',
-                    'update_frequency': 'hourly'
-                }
-            }
-        }
-        for resource, data in default_data.items():
-            file_path = base_path / f'{resource}_inv.json'
-            if not file_path.exists():
-                file_path.write_text(json.dumps(data, indent=2))
+        # No need to initialize files as they already exist with proper structure
+        pass
 
     def _get_suggested_paths(self, search_query: str) -> List[str]:
         suggestions = []
@@ -96,11 +63,28 @@ class LocalInventoryTool(BaseTool):
         def matches_query(text: str) -> bool:
             return any(term in text.lower() for term in query_terms)
 
-        if 'inventory' in data:
-            if matches_query(json.dumps(data['inventory'])):
-                return {'inventory': data['inventory']}
+        # Handle both fuel and salt inventory structures
+        inventory_key = 'fuel_inventory' if 'fuel_inventory' in data else 'salt_inventory'
+        
+        if inventory_key in data:
+            inventory_data = data[inventory_key]
+            matching_items = []
+            
+            # Search through each inventory item
+            for item in inventory_data:
+                if matches_query(json.dumps(item)):
+                    matching_items.append(item)
+            
+            if matching_items:
+                return {
+                    inventory_key: matching_items,
+                    'metadata': data.get('metadata', {})
+                }
+                
+        # If no specific matches found but query matches overall data
         if matches_query(json.dumps(data)):
             return data
+            
         return {}
 
     def _run(self, search_query: str, json_path: str) -> str:
@@ -138,7 +122,7 @@ class LocalInventoryTool(BaseTool):
                     "status": "no_results",
                     "message": f"No inventory data found matching query: {search_query}",
                     "suggested_paths": suggested_paths,
-                    "example_queries": ["fuel current_level", "salt inventory", "usage rate"]
+                    "example_queries": ["diesel quantity", "rock salt storage", "treated salt price", "last refill date"]
                 }, indent=2)
         except Exception as e:
             return json.dumps({

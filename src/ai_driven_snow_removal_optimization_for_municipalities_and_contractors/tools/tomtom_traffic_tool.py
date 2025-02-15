@@ -21,25 +21,23 @@ class TomTomTrafficTool(BaseTool):
     api_key: Optional[str] = None
     base_url: str = "https://api.tomtom.com"
     
-    # Region to coordinates mapping
+    # Region to coordinates mapping with major road intersections
+    # Coordinates in [longitude, latitude] format for GeoJSON compatibility
     region_coordinates: Dict[str, List[List[float]]] = {
-        # "Toronto": [
-        #     [43.6532, -79.3832],  # Downtown Toronto
-        #     [43.7046, -79.3590],  # North York
-        #     [43.6481, -79.4143],  # West Toronto
-        #     [43.6389, -79.3515]   # East Toronto
-        # ],
-        # "Montreal": [
-        #     [45.5017, -73.5673],  # Downtown Montreal
-        #     [45.5088, -73.5878],  # Plateau Mont-Royal
-        #     [45.4697, -73.6132],  # Westmount
-        #     [45.5461, -73.6369]   # Outremont
-        # ],
         "Quebec": [
-            [46.8139, -71.2080],  # Old Quebec
-            [46.8483, -71.2329],  # Saint-Roch
-            [46.7737, -71.2757],  # Sainte-Foy
-            [46.8063, -71.1534]   # Beauport
+            [-71.2080, 46.8139],  # Old Quebec
+            [-71.2329, 46.8483],  # Saint-Roch
+            [-71.2477, 46.8270],  # Saint-Jean-Baptiste
+            [-71.2205, 46.8131],  # Parliament Hill
+            [-71.2312, 46.8163],  # Grande Allée
+            [-71.2356, 46.8082],  # Plains of Abraham
+            [-71.2434, 46.8137],  # Avenue Cartier
+            [-71.2757, 46.7737],  # Sainte-Foy
+            [-71.1534, 46.8063],  # Beauport
+            [-71.2281, 46.8225],  # Saint-Jean Street
+            [-71.2179, 46.8156],  # Rue Saint-Louis
+            [-71.2073, 46.8147],  # Dufferin Terrace
+            [-71.2197, 46.8119]   # Côte de la Montagne
         ]
     }
     
@@ -68,7 +66,8 @@ class TomTomTrafficTool(BaseTool):
     
     def _calculate_route(self, coordinates: List[List[float]], route_type: str) -> dict:
         """Calculate optimal route between given coordinates."""
-        waypoints = [f"{coord[0]},{coord[1]}" for coord in coordinates]
+        # TomTom expects coordinates in latitude,longitude format
+        waypoints = [f"{coord[1]:.6f},{coord[0]:.6f}" for coord in coordinates]  # Convert to lat,lon for TomTom API
         locations = ':'.join(waypoints)
         
         endpoint = f"{self.base_url}/routing/1/calculateRoute/{locations}/json"
@@ -86,8 +85,8 @@ class TomTomTrafficTool(BaseTool):
     def _get_traffic_flow(self, coordinates: List[List[float]]) -> dict:
         """Get traffic flow data along the route."""
         # Calculate the bounding box from the coordinates
-        lats = [coord[0] for coord in coordinates]
-        lons = [coord[1] for coord in coordinates]
+        lats = [coord[1] for coord in coordinates]  # Extract latitude from [lon, lat]
+        lons = [coord[0] for coord in coordinates]  # Extract longitude from [lon, lat]
         min_lat = max(min(lats), -90)
         max_lat = min(max(lats), 90)
         min_lon = max(min(lons), -180)
@@ -120,77 +119,106 @@ class TomTomTrafficTool(BaseTool):
                     "details": f"Region '{region}' not found. Available regions: {list(self.region_coordinates.keys())}"
                 })
 
-            # Calculate bounding box for the region based on coordinates
-            lats = [coord[0] for coord in coordinates]
-            lons = [coord[1] for coord in coordinates]
-            min_lon = max(min(lons), -180)
-            max_lon = min(max(lons), 180)
-            min_lat = max(min(lats), -90)
-            max_lat = min(max(lats), 90)
+            # Calculate bounding box with padding for better coverage
+            lats = [coord[1] for coord in coordinates]  # Extract latitude from [lon, lat]
+            lons = [coord[0] for coord in coordinates]  # Extract longitude from [lon, lat]
+            center_lat = sum(lats) / len(lats)
+            center_lon = sum(lons) / len(lons)
+            
+            # Add padding of roughly 2km
+            padding = 0.02  # approximately 2km in decimal degrees
+            min_lon = max(min(lons) - padding, -180)
+            max_lon = min(max(lons) + padding, 180)
+            min_lat = max(min(lats) - padding, -90)
+            max_lat = min(max(lats) + padding, 90)
             bbox = f"{min_lon:.6f},{min_lat:.6f},{max_lon:.6f},{max_lat:.6f}"
 
-            # Gather all required data
+            # Get traffic incidents first
             incidents = self._get_traffic_incidents(bbox)
-            route = self._calculate_route(coordinates, route_type)
-            flow = self._get_traffic_flow(coordinates)
-
-            # Summarized logging instead of full JSON dump
-            incident_count = len(incidents.get('incidents', []))
-            road_closures = sum(1 for i in incidents.get('incidents', []) if i['properties'].get('iconCategory') == 6)
-
-            print(f"Traffic Report: {incident_count} incidents, {road_closures} road closures detected.")
-
-            # Extract incidents and format them for the map
-            formatted_incidents = []
-            formatted_closures = []
             
-            for incident in incidents.get('incidents', []):
-                props = incident.get('properties', {})
-                coords = incident.get('geometry', {}).get('coordinates', [])
-                
-                if coords and isinstance(coords, list) and len(coords) >= 2:
-                    lat = float(coords[1]) if isinstance(coords[1], (int, float, str)) else 0
-                    lon = float(coords[0]) if isinstance(coords[0], (int, float, str)) else 0
-                    
-                    if props.get('iconCategory') == 6:  # Road closure
-                        formatted_closures.append(f"Road closed at {lat}, {lon}")
-                    else:
-                        incident_desc = "Traffic incident"
-                        if props.get('iconCategory') == 1:
-                            incident_desc = "Accident"
-                        elif props.get('iconCategory') == 8:
-                            incident_desc = "Road works"
-                        elif props.get('iconCategory') == 9:
-                            incident_desc = "Traffic jam"
-                        formatted_incidents.append(f"{incident_desc} at {lat}, {lon}")
+            # Get traffic flow data for the region
+            flow = self._get_traffic_flow([[center_lat, center_lon]])
 
-            # Extract and validate route coordinates from the TomTom route response
-            route_coords = []
-            if route.get('routes') and route['routes'][0].get('legs'):
-                for point in route['routes'][0]['legs'][0].get('points', []):
-                    lon = float(point.get('longitude', 0))
-                    lat = float(point.get('latitude', 0))
-                    if -180 <= lon <= 180 and -90 <= lat <= 90:  # Validate coordinates
-                        route_coords.append([lon, lat])
+            # Calculate route using the region's coordinates for proper road alignment
+            route = self._calculate_route(coordinates, route_type)
 
-            # Format result for the data transformer
+            # Format result with proper GeoJSON
             result = {
                 "currentTrafficFlow": {
-                    "speed": flow.get('flowSegmentData', {}).get('currentSpeed', 0),
-                    "incidents": formatted_incidents,
-                    "roadClosures": formatted_closures,
-                    "optimized_route": {
-                        "routes": [{
-                            "legs": [{
-                                "points": [
-                                    {"longitude": coord[0], "latitude": coord[1]}
-                                    for coord in route_coords
-                                ]
-                            }]
-                        }]
-                    } if route_coords else None
-                }
+                    "speed": flow.get('flowSegmentData', {}).get('currentSpeed', 0)
+                },
+                "routes": [],
+                "incidents": [],
+                "roadClosures": []
             }
+
+            # Extract and format route from TomTom response
+            if route.get('routes'):
+                for route_obj in route['routes']:
+                    if route_obj.get('legs'):
+                        route_points = []
+                        for leg in route_obj['legs']:
+                            if leg.get('points'):
+                                for point in leg['points']:
+                                    lon = float(point.get('longitude', 0))
+                                    lat = float(point.get('latitude', 0))
+                                    if -180 <= lon <= 180 and -90 <= lat <= 90:
+                                        route_points.append([lon, lat])
+
+                        if route_points:
+                            result["routes"].append({
+                                "id": "route1",
+                                "priority": 1,
+                                "geometry": {
+                                    "type": "Feature",
+                                    "geometry": {
+                                        "type": "LineString",
+                                        "coordinates": route_points
+                                    }
+                                }
+                            })
+
+            # Process incidents into GeoJSON format
+            for incident in incidents.get('incidents', []):
+                coords = incident.get('geometry', {}).get('coordinates', [])
+                props = incident.get('properties', {})
+                
+                if coords and isinstance(coords, list) and len(coords) >= 2:
+                    lat = float(coords[1])
+                    lon = float(coords[0])
+                    
+                    if props.get('iconCategory') == 6:  # Road closure
+                        result["roadClosures"].append({
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [lon, lat]
+                            },
+                            "properties": {
+                                "type": "Road Closure",
+                                "description": "Road closed"
+                            }
+                        })
+                    else:
+                        incident_type = "Traffic incident"
+                        if props.get('iconCategory') == 1:
+                            incident_type = "Accident"
+                        elif props.get('iconCategory') == 8:
+                            incident_type = "Road works"
+                        elif props.get('iconCategory') == 9:
+                            incident_type = "Traffic jam"
+                            
+                        result["incidents"].append({
+                            "type": "Feature",
+                            "geometry": {
+                                "type": "Point",
+                                "coordinates": [lon, lat]
+                            },
+                            "properties": {
+                                "type": incident_type,
+                                "description": incident_type
+                            }
+                        })
 
             return json.dumps(result, indent=2)
 
