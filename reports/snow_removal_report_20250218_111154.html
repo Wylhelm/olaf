@@ -146,8 +146,8 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Current Conditions</h6>
-                                <div class="metric-value">-9.23°C</div>
-                                <div class="metric-label">Potential ice on roads</div>
+                                <div class="metric-value">-14.83°C</div>
+                                <div class="metric-label">Icy with forecasted snowfall and risks of new accumulation; road surface temperatures expected between -12°C and -17°C.</div>
                             </div>
                             <div>
                                 <h6>Accumulation</h6>
@@ -172,14 +172,14 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-6">
-                                <div class="metric-value" id="saltLevel">50.0%</div>
+                                <div class="metric-value" id="saltLevel">100.0%</div>
                                 <div class="metric-label">Salt Inventory</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
                                 </div>
                             </div>
                             <div class="col-6">
-                                <div class="metric-value" id="fuelLevel">50.0%</div>
+                                <div class="metric-value" id="fuelLevel">100.0%</div>
                                 <div class="metric-label">Fuel Reserves</div>
                                 <div class="progress mt-2">
                                     <div class="progress-bar bg-warning" role="progressbar" style="width: 60%"></div>
@@ -198,13 +198,13 @@
                 
 
                 <tr>
-                    <td>West Depot</td>
+                    <td>East Depot</td>
                     <td><span class="badge bg-success">Operational</span></td>
                 </tr>
                 
 
                 <tr>
-                    <td>East Depot</td>
+                    <td>West Depot</td>
                     <td><span class="badge bg-success">Operational</span></td>
                 </tr>
                 
@@ -225,12 +225,12 @@
                         <div class="d-flex justify-content-between mb-3">
                             <div>
                                 <h6>Active Routes</h6>
-                                <div class="metric-value">10</div>
+                                <div class="metric-value">2</div>
                                 <div class="metric-label">Currently Operating</div>
                             </div>
                             <div>
                                 <h6>Coverage</h6>
-                                <div class="metric-value">22.0%</div>
+                                <div class="metric-value">85.0%</div>
                                 <div class="metric-label">Priority Areas</div>
                             </div>
                         </div>
@@ -239,14 +239,11 @@
                             <h6>Priority Zones</h6>
                             <div class="progress mb-2" style="height: 20px;">
                                 <div class="progress-bar bg-success" role="progressbar" 
-                    style="width: 80.0%" aria-valuenow="80.0">
-                    Highway Network (80.0%)</div>
+                    style="width: 95.0%" aria-valuenow="95.0">
+                    Main roads (95.0%)</div>
 <div class="progress-bar bg-warning" role="progressbar" 
-                    style="width: 70.0%" aria-valuenow="70.0">
-                    Emergency Routes (70.0%)</div>
-<div class="progress-bar bg-danger" role="progressbar" 
-                    style="width: 60.0%" aria-valuenow="60.0">
-                    Commercial (60.0%)</div>
+                    style="width: 80.0%" aria-valuenow="80.0">
+                    Critical intersections (80.0%)</div>
                             </div>
                         </div>
                     </div>
@@ -345,81 +342,17 @@
                                 <tbody id="fleetStatus">
                                     
                 <tr>
-                    <td>Truck 1</td>
+                    <td>V1</td>
                     <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 1</td>
+                    <td>North</td>
                     <td>High</td>
                 </tr>
                 
 
                 <tr>
-                    <td>Truck 2</td>
+                    <td>V2</td>
                     <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 2</td>
-                    <td>High</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 3</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 3</td>
-                    <td>High</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 4</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 4</td>
-                    <td>High</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 5</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 5</td>
-                    <td>High</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 6</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 6</td>
-                    <td>Medium</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 7</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 7</td>
-                    <td>Medium</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 8</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 8</td>
-                    <td>Medium</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 9</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 9</td>
-                    <td>Medium</td>
-                </tr>
-                
-
-                <tr>
-                    <td>Truck 10</td>
-                    <td><span class="badge bg-success">Active</span></td>
-                    <td>Zone 10</td>
+                    <td>East</td>
                     <td>Medium</td>
                 </tr>
                 
@@ -441,8 +374,13 @@
                     </div>
                     <div class="card-body">
                         
-                <div class="alert alert-info" role="alert">
-                    <i class="fas fa-info-circle"></i> Real-time communication feed active. All teams are standing by for updates and contingency actions as per the operational timeline.
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> Monitor fuel levels closely at Main Depot and adjust route for heavy traffic areas due to upcoming snowfall.
+                </div>
+                
+
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> Alternative route recommended for V2 due to potential congestion near East Depot.
                 </div>
                 
                         <div class="mt-3">
@@ -481,8 +419,8 @@
 
         // Initialize chart data
         const chartData = {
-            weather: JSON.parse("{\"labels\": [\"2025-02-14T21:00:00\", \"2025-02-15T00:00:00\", \"2025-02-15T03:00:00\", \"2025-02-15T06:00:00\", \"2025-02-15T09:00:00\", \"2025-02-15T12:00:00\", \"2025-02-15T15:00:00\"], \"datasets\": [{\"label\": \"Snowfall (cm/h)\", \"data\": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], \"borderColor\": \"#3498db\", \"tension\": 0.4}, {\"label\": \"Temperature (\\u00b0C)\", \"data\": [-9.23, -10.62, -13.8, -19.3, -22.42, -24.97, -16.5], \"borderColor\": \"#e74c3c\", \"tension\": 0.4}]}"),
-            route: JSON.parse("{\"labels\": [\"Route 1\", \"Route 2\", \"Route 3\", \"Route 4\", \"Route 5\", \"Route 6\", \"Route 7\", \"Route 8\", \"Route 9\", \"Route 10\"], \"datasets\": [{\"label\": \"Route Efficiency Score\", \"data\": [85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0], \"backgroundColor\": \"#3498db\"}]}")
+            weather: JSON.parse("{\"labels\": [\"18:00\", \"21:00\", \"00:00\", \"03:00\", \"06:00\"], \"datasets\": [{\"label\": \"Snowfall (cm/h)\", \"data\": [0.54, 0.51, 0.36, 0.36, 0.1], \"borderColor\": \"#3498db\", \"tension\": 0.4}, {\"label\": \"Temperature (\\u00b0C)\", \"data\": [-12.0, -13.0, -15.0, -16.0, -17.0], \"borderColor\": \"#e74c3c\", \"tension\": 0.4}]}"),
+            route: JSON.parse("{\"labels\": [\"V1 Route\", \"V2 Route\"], \"datasets\": [{\"label\": \"Route Efficiency Score\", \"data\": [89.0, 85.0], \"backgroundColor\": \"#3498db\"}]}")
         };
 
         // Weather Chart
@@ -558,12 +496,91 @@
                 console.error('TomTom API key is missing');
                 document.getElementById('map').innerHTML = '<div class="alert alert-danger">Map cannot be loaded: Missing API key</div>';
             } else {
+                // Parse map data first to validate it
+                let mapData;
+                try {
+                    const mapDataStr = '{\\\"routes\\\":[],\\\"incidents\\\":[]}'.replace(/\\/g, '');
+                    console.log('Raw map data:', mapDataStr);
+                    mapData = JSON.parse(mapDataStr);
+                    console.log('Parsed map data:', mapData);
+                } catch (error) {
+                    console.error('Error parsing map data:', error);
+                    mapData = { routes: [], incidents: [] };
+                }
+
+                // Initialize map
                 map = tt.map({
                     key: tomtomApiKey,
                     container: 'map',
                     center: [-71.2108, 46.8139], // Quebec City coordinates
                     zoom: 11,
                     style: 'https://api.tomtom.com/style/1/style/22.2.1-*?map=2/basic_street-light&key=' + tomtomApiKey
+                });
+
+                // Add map controls
+                map.addControl(new tt.NavigationControl());
+                map.addControl(new tt.FullscreenControl());
+
+                // Wait for map to load before adding data
+                map.on('load', function() {
+                    try {
+                        // Add routes first
+                        if (mapData.routes && mapData.routes.length > 0) {
+                            console.log('Adding routes:', mapData.routes);
+                            addRoutes(mapData.routes);
+                        }
+                        
+                        // Add incidents and road closures
+                        if (mapData.incidents && mapData.incidents.length > 0) {
+                            console.log('Adding incidents:', mapData.incidents);
+                            addTrafficIncidents(mapData.incidents);
+                        }
+                        
+                        // Add road closures if they exist separately
+                        if (mapData.roadClosures && mapData.roadClosures.length > 0) {
+                            console.log('Adding road closures:', mapData.roadClosures);
+                            addTrafficIncidents(mapData.roadClosures);
+                        }
+
+                        // Fit map to show all features
+                        const bounds = new tt.LngLatBounds();
+                        let hasFeatures = false;
+
+                        // Include routes in bounds
+                        if (mapData.routes && mapData.routes.length > 0) {
+                            mapData.routes.forEach(route => {
+                                if (route.coordinates) {
+                                    route.coordinates.forEach(coord => {
+                                        bounds.extend(new tt.LngLat(coord[0], coord[1]));
+                                        hasFeatures = true;
+                                    });
+                                }
+                            });
+                        }
+
+                        // Include incidents in bounds
+                        if (mapData.incidents && mapData.incidents.length > 0) {
+                            mapData.incidents.forEach(incident => {
+                                if (incident.geometry && incident.geometry.coordinates) {
+                                    bounds.extend(new tt.LngLat(
+                                        incident.geometry.coordinates[0],
+                                        incident.geometry.coordinates[1]
+                                    ));
+                                    hasFeatures = true;
+                                }
+                            });
+                        }
+
+                        // Fit map to bounds if we have features
+                        if (hasFeatures) {
+                            map.fitBounds(bounds, {
+                                padding: 50,
+                                maxZoom: 15
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error adding map data:', error);
+                    }
                 });
             }
         } catch (error) {
@@ -577,79 +594,128 @@
             map.addControl(new tt.FullscreenControl());
         }
 
-        // Function to add route layers
-        function addRoutes(routes) {
-            if (!routes || !map) return;
-            
-            const routeColors = {
-                1: '#003DA5', // Priority 1 - Quebec Blue
-                2: '#4CAF50', // Priority 2 - Green
-                3: '#FFC107'  // Priority 3 - Yellow
-            };
+                // Function to add route layers
+                function addRoutes(routes) {
+                    if (!routes || !map) return;
+                    
+                    const routeColors = {
+                        1: '#003DA5', // Priority 1 - Quebec Blue
+                        2: '#4CAF50', // Priority 2 - Green
+                        3: '#FFC107'  // Priority 3 - Yellow
+                    };
 
-            routes.forEach(route => {
-                const color = routeColors[route.priority] || '#003DA5';
-                
-                new tt.LngLatBounds();
-                
-                map.addLayer({
-                    id: `route-${route.id}`,
-                    type: 'line',
-                    source: {
-                        type: 'geojson',
-                        data: route.geometry
-                    },
-                    paint: {
-                        'line-color': color,
-                        'line-width': 4
-                    }
-                });
-            });
-        }
+                    routes.forEach((route, index) => {
+                        try {
+                            console.log(`Processing route ${index}:`, route);
+                            const color = routeColors[route.priority] || '#003DA5';
+                            
+                            // Create bounds to fit all routes
+                            const bounds = new tt.LngLatBounds();
+                            
+                            // Validate and extract coordinates
+                            if (route.geometry && route.geometry.geometry && 
+                                route.geometry.geometry.coordinates && 
+                                Array.isArray(route.geometry.geometry.coordinates)) {
+                                
+                                route.geometry.geometry.coordinates.forEach(coord => {
+                                    if (Array.isArray(coord) && coord.length === 2) {
+                                        bounds.extend(new tt.LngLat(coord[0], coord[1]));
+                                    }
+                                });
+                                
+                                // Add the route layer
+                                map.addLayer({
+                                    id: `route-${route.id || index}`,
+                                    type: 'line',
+                                    source: {
+                                        type: 'geojson',
+                                        data: route.geometry
+                                    },
+                                    paint: {
+                                        'line-color': color,
+                                        'line-width': 4
+                                    }
+                                });
+                                
+                                // Fit map to bounds with padding
+                                map.fitBounds(bounds, {
+                                    padding: 50,
+                                    maxZoom: 15
+                                });
+                            } else {
+                                console.error('Invalid route geometry:', route.geometry);
+                            }
+                        } catch (error) {
+                            console.error(`Error adding route ${index}:`, error);
+                        }
+                    });
+                }
 
-        // Function to add traffic incidents
+        // Function to add traffic incidents and road closures
         function addTrafficIncidents(incidents) {
             if (!incidents || !map) return;
 
             const iconMap = {
-                0: '🚗', // Unknown
-                1: '💥', // Accident
-                2: '🚧', // RoadClosed
-                3: '🚧', // RoadWorks
-                4: '🚦'  // Jam
+                'Accident': '💥',
+                'Road Closure': '🚫',
+                'Road works': '🚧',
+                'Traffic jam': '🚦',
+                'Traffic incident': '⚠️'
             };
 
-            incidents.forEach(incident => {
-                const el = document.createElement('div');
-                el.className = 'marker';
-                el.style.backgroundColor = '#e74c3c';
-                el.style.width = '24px';
-                el.style.height = '24px';
-                el.style.borderRadius = '50%';
-                el.style.border = '2px solid white';
-                el.style.boxShadow = '0 0 4px rgba(0,0,0,0.3)';
-                el.style.display = 'flex';
-                el.style.alignItems = 'center';
-                el.style.justifyContent = 'center';
-                el.style.fontSize = '16px';
-                el.innerHTML = iconMap[incident.type] || iconMap[0];
+            const bounds = new tt.LngLatBounds();
 
-                new tt.Marker({element: el})
-                    .setLngLat([incident.longitude, incident.latitude])
-                    .setPopup(new tt.Popup({offset: 25})
-                        .setHTML(`<strong>${incident.type}</strong><br>${incident.description}`))
-                    .addTo(map);
+            // Process both incidents and road closures
+            incidents.forEach((feature, index) => {
+                try {
+                    console.log(`Processing feature ${index}:`, feature);
+                    
+                    if (!feature.geometry || !feature.geometry.coordinates) {
+                        console.error('Invalid feature geometry:', feature);
+                        return;
+                    }
+
+                    const coordinates = feature.geometry.coordinates;
+                    const type = feature.properties.type;
+                    const description = feature.properties.description;
+
+                    // Create marker element
+                    const el = document.createElement('div');
+                    el.className = 'marker';
+                    el.style.backgroundColor = type === 'Road Closure' ? '#e74c3c' : '#f39c12';
+                    el.style.width = '24px';
+                    el.style.height = '24px';
+                    el.style.borderRadius = '50%';
+                    el.style.border = '2px solid white';
+                    el.style.boxShadow = '0 0 4px rgba(0,0,0,0.3)';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                    el.style.fontSize = '16px';
+                    el.innerHTML = iconMap[type] || '⚠️';
+
+                    // Add marker to map
+                    bounds.extend(new tt.LngLat(coordinates[0], coordinates[1]));
+
+                    new tt.Marker({element: el})
+                        .setLngLat(coordinates)
+                        .setPopup(new tt.Popup({offset: 25})
+                            .setHTML(`<strong>${type}</strong><br>${description}`))
+                        .addTo(map);
+                } catch (error) {
+                    console.error(`Error adding feature ${index}:`, error);
+                }
             });
+
+            // If we have valid incidents, fit the map to show them all
+            if (!bounds.isEmpty()) {
+                map.fitBounds(bounds, {
+                    padding: 50,
+                    maxZoom: 15
+                });
+            }
         }
 
-        // Initialize map data
-        try {
-            const mapData = JSON.parse(`{"routes": [{"id": "route1", "priority": 1, "geometry": {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[-71.208, 46.8139], [-71.2329, 46.8483], [-71.2757, 46.7737], [-71.1534, 46.8063]]}}}], "incidents": []}`);
-            addRoutes(mapData.routes);
-            addTrafficIncidents(mapData.incidents);
-        } catch (error) {
-            console.error('Error initializing map data:', error);
-        }
     </script>
 </body>
 </html>
